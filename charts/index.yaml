@@ -18,7 +18,49 @@ entries:
           url: https://www.jenkins.io/
     apiVersion: v2
     appVersion: 2.361.1
-    created: "2022-10-06T04:49:19.894947156Z"
+    created: "2022-10-06T04:55:39.396260911Z"
+    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
+    digest: 002c8e204924b141604a95c73b1ee3674ab04d4bbaeca01502b186566c0e96d8
+    home: https://jenkins.io/
+    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
+    maintainers:
+    - email: maor.friedman@redhat.com
+      name: maorfr
+    - email: mail@torstenwalter.de
+      name: torstenwalter
+    - email: garridomota@gmail.com
+      name: mogaal
+    - email: wmcdona89@gmail.com
+      name: wmcdona89
+    - email: timjacomb1@gmail.com
+      name: timja
+    name: jenkins
+    sources:
+    - https://github.com/jenkinsci/jenkins
+    - https://github.com/jenkinsci/docker-inbound-agent
+    - https://github.com/maorfr/kube-tasks
+    - https://github.com/jenkinsci/configuration-as-code-plugin
+    urls:
+    - jenkins-4.2.12.tgz
+    version: 4.2.12
+  - annotations:
+      artifacthub.io/images: |
+        - name: jenkins
+          image: jenkins/jenkins:2.361.1-jdk11
+        - name: k8s-sidecar
+          image: kiwigrid/k8s-sidecar:1.15.0
+        - name: inbound-agent
+          image: jenkins/inbound-agent:4.11.2-4
+        - name: backup
+          image: maorfr/kube-tasks:0.2.0
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
+        - name: Jenkins
+          url: https://www.jenkins.io/
+    apiVersion: v2
+    appVersion: 2.361.1
+    created: "2022-10-06T04:55:39.391191838Z"
     description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
     digest: 02eafdd1a20ac200379a0cf48b7b7098638784bdc660cd5e62a653a208d217a2
     home: https://jenkins.io/
@@ -60,7 +102,7 @@ entries:
           url: https://www.jenkins.io/
     apiVersion: v2
     appVersion: 2.361.1
-    created: "2022-10-06T04:49:19.889756274Z"
+    created: "2022-10-06T04:55:39.384754782Z"
     description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
     digest: 3e7fe8d72d5eac4af096041c5264231212c2ef2681e7796bd523ad7709e6e90e
     home: https://jenkins.io/
@@ -102,7 +144,7 @@ entries:
           url: https://www.jenkins.io/
     apiVersion: v2
     appVersion: 2.361.1
-    created: "2022-10-06T04:49:19.905737865Z"
+    created: "2022-10-06T04:55:39.406712304Z"
     description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
     digest: 91afcd062f782a35d22db5dba6fc7d67ec62c4d6437a6122112d5ece2a6bb1e6
     home: https://jenkins.io/
@@ -144,7 +186,7 @@ entries:
           url: https://www.jenkins.io/
     apiVersion: v2
     appVersion: 2.361.1
-    created: "2022-10-06T04:49:19.900363551Z"
+    created: "2022-10-06T04:55:39.402003066Z"
     description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
     digest: fcad02bacebc65146d97221849de96c53e7def386f94a340b06612447368cd62
     home: https://jenkins.io/
@@ -169,4 +211,4 @@ entries:
     urls:
     - jenkins-4.2.8.tgz
     version: 4.2.8
-generated: "2022-10-06T04:49:19.884235715Z"
+generated: "2022-10-06T04:55:39.375574262Z"
