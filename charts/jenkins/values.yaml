@@ -435,7 +435,8 @@ controller:
     enabled: true #changed from false
     # Override for the default paths that map requests to the backend
     paths: #changed from []
-    - backend: #changed
+    - pathType: Prefix
+      backend: #changed
         service: 
           name: >- #changed
             {{ template "jenkins.fullname" . }}
