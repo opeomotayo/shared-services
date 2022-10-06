@@ -432,9 +432,10 @@ controller:
   updateStrategy: {}
 
   ingress:
-    enabled: false
+    enabled: true #changed from false
     # Override for the default paths that map requests to the backend
     paths: #changed from []
+<<<<<<< HEAD
     - pathType: Prefix
       path: "/"
       backend: #changed
@@ -444,6 +445,13 @@ controller:
         # Don't use string here, use only integer value!
           port: 
             number: 8080 #changed
+=======
+    - backend: #changed
+        serviceName: >- #changed
+          {{ template "jenkins.fullname" . }} #changed
+        # Don't use string here, use only integer value!
+        servicePort: 8080 #changed
+>>>>>>> Adding custom chart values
     # For Kubernetes v1.14+, use 'networking.k8s.io/v1beta1'
     # For Kubernetes v1.19+, use 'networking.k8s.io/v1'
     apiVersion: "networking.k8s.io/v1" #changed
@@ -455,6 +463,10 @@ controller:
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     # ingressClassName: nginx
     # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
+<<<<<<< HEAD
+=======
+    path: "/" #changed
+>>>>>>> Adding custom chart values
     # configures the hostname e.g. jenkins.example.com
     hostName: jenkins.opeomotayo.net #changed
     tls:
