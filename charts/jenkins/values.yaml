@@ -93,7 +93,7 @@ controller:
   # If you are not using the provided ingress you can specify `controller.jenkinsUrl` to change the url definition.
   # jenkinsUrl: ""
   # If you set this prefix and use ingress controller then you might want to set the ingress path below
-  # jenkinsUriPrefix: "/jenkins"
+  jenkinsUriPrefix: "/jenkins" #changed
   # Enable pod security context (must be `true` if podSecurityContextOverride, runAsUser or fsGroup are set)
   usePodSecurityContext: true
   # Note that `runAsUser`, `fsGroup`, and `securityContextCapabilities` are
@@ -454,7 +454,7 @@ controller:
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     # ingressClassName: nginx
     # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
-    path: "/" #changed
+    path: "/jenkins" #changed
     # configures the hostname e.g. jenkins.example.com
     hostName: jenkins.opeomotayo.net #changed
     tls:
