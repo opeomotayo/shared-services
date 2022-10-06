@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 #managed by opeomotayo
-=======
->>>>>>> Adding custom chart values
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
