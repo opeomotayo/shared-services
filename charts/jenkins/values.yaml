@@ -93,7 +93,7 @@ controller:
   # If you are not using the provided ingress you can specify `controller.jenkinsUrl` to change the url definition.
   # jenkinsUrl: ""
   # If you set this prefix and use ingress controller then you might want to set the ingress path below
-  jenkinsUriPrefix: "/jenkins"
+  # jenkinsUriPrefix: "/jenkins"
   # Enable pod security context (must be `true` if podSecurityContextOverride, runAsUser or fsGroup are set)
   usePodSecurityContext: true
   # Note that `runAsUser`, `fsGroup`, and `securityContextCapabilities` are
