@@ -432,7 +432,7 @@ controller:
   updateStrategy: {}
 
   ingress:
-    enabled: true #changed from false
+    enabled: false
     # Override for the default paths that map requests to the backend
     paths: #changed from []
     - pathType: Prefix
