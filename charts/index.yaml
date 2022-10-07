@@ -18,7 +18,91 @@ entries:
           url: https://www.jenkins.io/
     apiVersion: v2
     appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.338952098Z"
+    created: "2022-10-07T05:55:53.842884674Z"
+    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
+    digest: 384286725daeb097c6645fc61f1adc1b1c6b45e8f9ce3fe3ba567fec45ebffec
+    home: https://jenkins.io/
+    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
+    maintainers:
+    - email: maor.friedman@redhat.com
+      name: maorfr
+    - email: mail@torstenwalter.de
+      name: torstenwalter
+    - email: garridomota@gmail.com
+      name: mogaal
+    - email: wmcdona89@gmail.com
+      name: wmcdona89
+    - email: timjacomb1@gmail.com
+      name: timja
+    name: jenkins
+    sources:
+    - https://github.com/jenkinsci/jenkins
+    - https://github.com/jenkinsci/docker-inbound-agent
+    - https://github.com/maorfr/kube-tasks
+    - https://github.com/jenkinsci/configuration-as-code-plugin
+    urls:
+    - jenkins-4.2.18.tgz
+    version: 4.2.18
+  - annotations:
+      artifacthub.io/images: |
+        - name: jenkins
+          image: jenkins/jenkins:2.361.1-jdk11
+        - name: k8s-sidecar
+          image: kiwigrid/k8s-sidecar:1.15.0
+        - name: inbound-agent
+          image: jenkins/inbound-agent:4.11.2-4
+        - name: backup
+          image: maorfr/kube-tasks:0.2.0
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
+        - name: Jenkins
+          url: https://www.jenkins.io/
+    apiVersion: v2
+    appVersion: 2.361.1
+    created: "2022-10-07T05:55:53.837389893Z"
+    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
+    digest: cbf6246aef0758296a6634fc9bee4b9552989a0e19d8bcd927bab0b12f795290
+    home: https://jenkins.io/
+    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
+    maintainers:
+    - email: maor.friedman@redhat.com
+      name: maorfr
+    - email: mail@torstenwalter.de
+      name: torstenwalter
+    - email: garridomota@gmail.com
+      name: mogaal
+    - email: wmcdona89@gmail.com
+      name: wmcdona89
+    - email: timjacomb1@gmail.com
+      name: timja
+    name: jenkins
+    sources:
+    - https://github.com/jenkinsci/jenkins
+    - https://github.com/jenkinsci/docker-inbound-agent
+    - https://github.com/maorfr/kube-tasks
+    - https://github.com/jenkinsci/configuration-as-code-plugin
+    urls:
+    - jenkins-4.2.17.tgz
+    version: 4.2.17
+  - annotations:
+      artifacthub.io/images: |
+        - name: jenkins
+          image: jenkins/jenkins:2.361.1-jdk11
+        - name: k8s-sidecar
+          image: kiwigrid/k8s-sidecar:1.15.0
+        - name: inbound-agent
+          image: jenkins/inbound-agent:4.11.2-4
+        - name: backup
+          image: maorfr/kube-tasks:0.2.0
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
+        - name: Jenkins
+          url: https://www.jenkins.io/
+    apiVersion: v2
+    appVersion: 2.361.1
+    created: "2022-10-07T05:55:53.832858468Z"
     description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
     digest: f7c633c53546ad5dcc4da2bbb9ac99bede32d44524e0f633a15d25f73d13b415
     home: https://jenkins.io/
@@ -43,340 +127,4 @@ entries:
     urls:
     - jenkins-4.2.16.tgz
     version: 4.2.16
-  - annotations:
-      artifacthub.io/images: |
-        - name: jenkins
-          image: jenkins/jenkins:2.361.1-jdk11
-        - name: k8s-sidecar
-          image: kiwigrid/k8s-sidecar:1.15.0
-        - name: inbound-agent
-          image: jenkins/inbound-agent:4.11.2-4
-        - name: backup
-          image: maorfr/kube-tasks:0.2.0
-      artifacthub.io/links: |
-        - name: Chart Source
-          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
-        - name: Jenkins
-          url: https://www.jenkins.io/
-    apiVersion: v2
-    appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.333814581Z"
-    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
-    digest: 2ccc3ed31847c13c7356d549fcf6ebbdb69b74b186e2d000aba2995e69938fb2
-    home: https://jenkins.io/
-    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
-    maintainers:
-    - email: maor.friedman@redhat.com
-      name: maorfr
-    - email: mail@torstenwalter.de
-      name: torstenwalter
-    - email: garridomota@gmail.com
-      name: mogaal
-    - email: wmcdona89@gmail.com
-      name: wmcdona89
-    - email: timjacomb1@gmail.com
-      name: timja
-    name: jenkins
-    sources:
-    - https://github.com/jenkinsci/jenkins
-    - https://github.com/jenkinsci/docker-inbound-agent
-    - https://github.com/maorfr/kube-tasks
-    - https://github.com/jenkinsci/configuration-as-code-plugin
-    urls:
-    - jenkins-4.2.15.tgz
-    version: 4.2.15
-  - annotations:
-      artifacthub.io/images: |
-        - name: jenkins
-          image: jenkins/jenkins:2.361.1-jdk11
-        - name: k8s-sidecar
-          image: kiwigrid/k8s-sidecar:1.15.0
-        - name: inbound-agent
-          image: jenkins/inbound-agent:4.11.2-4
-        - name: backup
-          image: maorfr/kube-tasks:0.2.0
-      artifacthub.io/links: |
-        - name: Chart Source
-          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
-        - name: Jenkins
-          url: https://www.jenkins.io/
-    apiVersion: v2
-    appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.32892524Z"
-    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
-    digest: 67c6bf3b97e3bc08ff9dec7ef28bfb5b54db02795b0494dd85e6695b3eee362e
-    home: https://jenkins.io/
-    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
-    maintainers:
-    - email: maor.friedman@redhat.com
-      name: maorfr
-    - email: mail@torstenwalter.de
-      name: torstenwalter
-    - email: garridomota@gmail.com
-      name: mogaal
-    - email: wmcdona89@gmail.com
-      name: wmcdona89
-    - email: timjacomb1@gmail.com
-      name: timja
-    name: jenkins
-    sources:
-    - https://github.com/jenkinsci/jenkins
-    - https://github.com/jenkinsci/docker-inbound-agent
-    - https://github.com/maorfr/kube-tasks
-    - https://github.com/jenkinsci/configuration-as-code-plugin
-    urls:
-    - jenkins-4.2.14.tgz
-    version: 4.2.14
-  - annotations:
-      artifacthub.io/images: |
-        - name: jenkins
-          image: jenkins/jenkins:2.361.1-jdk11
-        - name: k8s-sidecar
-          image: kiwigrid/k8s-sidecar:1.15.0
-        - name: inbound-agent
-          image: jenkins/inbound-agent:4.11.2-4
-        - name: backup
-          image: maorfr/kube-tasks:0.2.0
-      artifacthub.io/links: |
-        - name: Chart Source
-          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
-        - name: Jenkins
-          url: https://www.jenkins.io/
-    apiVersion: v2
-    appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.322372598Z"
-    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
-    digest: 7d6d5ff20a56ada801f0e92b23b3e95ee65a409079d60c7a8fdf6ba0fb2ac546
-    home: https://jenkins.io/
-    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
-    maintainers:
-    - email: maor.friedman@redhat.com
-      name: maorfr
-    - email: mail@torstenwalter.de
-      name: torstenwalter
-    - email: garridomota@gmail.com
-      name: mogaal
-    - email: wmcdona89@gmail.com
-      name: wmcdona89
-    - email: timjacomb1@gmail.com
-      name: timja
-    name: jenkins
-    sources:
-    - https://github.com/jenkinsci/jenkins
-    - https://github.com/jenkinsci/docker-inbound-agent
-    - https://github.com/maorfr/kube-tasks
-    - https://github.com/jenkinsci/configuration-as-code-plugin
-    urls:
-    - jenkins-4.2.13.tgz
-    version: 4.2.13
-  - annotations:
-      artifacthub.io/images: |
-        - name: jenkins
-          image: jenkins/jenkins:2.361.1-jdk11
-        - name: k8s-sidecar
-          image: kiwigrid/k8s-sidecar:1.15.0
-        - name: inbound-agent
-          image: jenkins/inbound-agent:4.11.2-4
-        - name: backup
-          image: maorfr/kube-tasks:0.2.0
-      artifacthub.io/links: |
-        - name: Chart Source
-          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
-        - name: Jenkins
-          url: https://www.jenkins.io/
-    apiVersion: v2
-    appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.31753283Z"
-    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
-    digest: 002c8e204924b141604a95c73b1ee3674ab04d4bbaeca01502b186566c0e96d8
-    home: https://jenkins.io/
-    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
-    maintainers:
-    - email: maor.friedman@redhat.com
-      name: maorfr
-    - email: mail@torstenwalter.de
-      name: torstenwalter
-    - email: garridomota@gmail.com
-      name: mogaal
-    - email: wmcdona89@gmail.com
-      name: wmcdona89
-    - email: timjacomb1@gmail.com
-      name: timja
-    name: jenkins
-    sources:
-    - https://github.com/jenkinsci/jenkins
-    - https://github.com/jenkinsci/docker-inbound-agent
-    - https://github.com/maorfr/kube-tasks
-    - https://github.com/jenkinsci/configuration-as-code-plugin
-    urls:
-    - jenkins-4.2.12.tgz
-    version: 4.2.12
-  - annotations:
-      artifacthub.io/images: |
-        - name: jenkins
-          image: jenkins/jenkins:2.361.1-jdk11
-        - name: k8s-sidecar
-          image: kiwigrid/k8s-sidecar:1.15.0
-        - name: inbound-agent
-          image: jenkins/inbound-agent:4.11.2-4
-        - name: backup
-          image: maorfr/kube-tasks:0.2.0
-      artifacthub.io/links: |
-        - name: Chart Source
-          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
-        - name: Jenkins
-          url: https://www.jenkins.io/
-    apiVersion: v2
-    appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.313155328Z"
-    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
-    digest: 02eafdd1a20ac200379a0cf48b7b7098638784bdc660cd5e62a653a208d217a2
-    home: https://jenkins.io/
-    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
-    maintainers:
-    - email: maor.friedman@redhat.com
-      name: maorfr
-    - email: mail@torstenwalter.de
-      name: torstenwalter
-    - email: garridomota@gmail.com
-      name: mogaal
-    - email: wmcdona89@gmail.com
-      name: wmcdona89
-    - email: timjacomb1@gmail.com
-      name: timja
-    name: jenkins
-    sources:
-    - https://github.com/jenkinsci/jenkins
-    - https://github.com/jenkinsci/docker-inbound-agent
-    - https://github.com/maorfr/kube-tasks
-    - https://github.com/jenkinsci/configuration-as-code-plugin
-    urls:
-    - jenkins-4.2.11.tgz
-    version: 4.2.11
-  - annotations:
-      artifacthub.io/images: |
-        - name: jenkins
-          image: jenkins/jenkins:2.361.1-jdk11
-        - name: k8s-sidecar
-          image: kiwigrid/k8s-sidecar:1.15.0
-        - name: inbound-agent
-          image: jenkins/inbound-agent:4.11.2-4
-        - name: backup
-          image: maorfr/kube-tasks:0.2.0
-      artifacthub.io/links: |
-        - name: Chart Source
-          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
-        - name: Jenkins
-          url: https://www.jenkins.io/
-    apiVersion: v2
-    appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.307982044Z"
-    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
-    digest: 3e7fe8d72d5eac4af096041c5264231212c2ef2681e7796bd523ad7709e6e90e
-    home: https://jenkins.io/
-    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
-    maintainers:
-    - email: maor.friedman@redhat.com
-      name: maorfr
-    - email: mail@torstenwalter.de
-      name: torstenwalter
-    - email: garridomota@gmail.com
-      name: mogaal
-    - email: wmcdona89@gmail.com
-      name: wmcdona89
-    - email: timjacomb1@gmail.com
-      name: timja
-    name: jenkins
-    sources:
-    - https://github.com/jenkinsci/jenkins
-    - https://github.com/jenkinsci/docker-inbound-agent
-    - https://github.com/maorfr/kube-tasks
-    - https://github.com/jenkinsci/configuration-as-code-plugin
-    urls:
-    - jenkins-4.2.10.tgz
-    version: 4.2.10
-  - annotations:
-      artifacthub.io/images: |
-        - name: jenkins
-          image: jenkins/jenkins:2.361.1-jdk11
-        - name: k8s-sidecar
-          image: kiwigrid/k8s-sidecar:1.15.0
-        - name: inbound-agent
-          image: jenkins/inbound-agent:4.11.2-4
-        - name: backup
-          image: maorfr/kube-tasks:0.2.0
-      artifacthub.io/links: |
-        - name: Chart Source
-          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
-        - name: Jenkins
-          url: https://www.jenkins.io/
-    apiVersion: v2
-    appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.349581256Z"
-    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
-    digest: 91afcd062f782a35d22db5dba6fc7d67ec62c4d6437a6122112d5ece2a6bb1e6
-    home: https://jenkins.io/
-    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
-    maintainers:
-    - email: maor.friedman@redhat.com
-      name: maorfr
-    - email: mail@torstenwalter.de
-      name: torstenwalter
-    - email: garridomota@gmail.com
-      name: mogaal
-    - email: wmcdona89@gmail.com
-      name: wmcdona89
-    - email: timjacomb1@gmail.com
-      name: timja
-    name: jenkins
-    sources:
-    - https://github.com/jenkinsci/jenkins
-    - https://github.com/jenkinsci/docker-inbound-agent
-    - https://github.com/maorfr/kube-tasks
-    - https://github.com/jenkinsci/configuration-as-code-plugin
-    urls:
-    - jenkins-4.2.9.tgz
-    version: 4.2.9
-  - annotations:
-      artifacthub.io/images: |
-        - name: jenkins
-          image: jenkins/jenkins:2.361.1-jdk11
-        - name: k8s-sidecar
-          image: kiwigrid/k8s-sidecar:1.15.0
-        - name: inbound-agent
-          image: jenkins/inbound-agent:4.11.2-4
-        - name: backup
-          image: maorfr/kube-tasks:0.2.0
-      artifacthub.io/links: |
-        - name: Chart Source
-          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
-        - name: Jenkins
-          url: https://www.jenkins.io/
-    apiVersion: v2
-    appVersion: 2.361.1
-    created: "2022-10-06T07:35:27.344532817Z"
-    description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
-    digest: fcad02bacebc65146d97221849de96c53e7def386f94a340b06612447368cd62
-    home: https://jenkins.io/
-    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
-    maintainers:
-    - email: maor.friedman@redhat.com
-      name: maorfr
-    - email: mail@torstenwalter.de
-      name: torstenwalter
-    - email: garridomota@gmail.com
-      name: mogaal
-    - email: wmcdona89@gmail.com
-      name: wmcdona89
-    - email: timjacomb1@gmail.com
-      name: timja
-    name: jenkins
-    sources:
-    - https://github.com/jenkinsci/jenkins
-    - https://github.com/jenkinsci/docker-inbound-agent
-    - https://github.com/maorfr/kube-tasks
-    - https://github.com/jenkinsci/configuration-as-code-plugin
-    urls:
-    - jenkins-4.2.8.tgz
-    version: 4.2.8
-generated: "2022-10-06T07:35:27.300139484Z"
+generated: "2022-10-07T05:55:53.827156939Z"
