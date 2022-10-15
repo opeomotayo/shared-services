@@ -23,7 +23,10 @@ pipeline {
     stage('Build Image') {
       steps {
         script {
-            sh "docker build -t ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG} -t ${REPO_NAME}/${APP_NAME}:latest ./flask-code"
+            dir("flask-code"){
+               app = docker.build("${REPO_NAME}/${APP_NAME}:${IMAGE_TAG}") 
+            }
+            // sh "docker build -t ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG} -t ${REPO_NAME}/${APP_NAME}:latest ./flask-code"
         }
       }
     }
