@@ -26,7 +26,6 @@ pipeline {
             dir("flask-code"){
                app = docker.build("${REPO_NAME}/${APP_NAME}:${IMAGE_TAG}") 
             }
-            // sh "docker build -t ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG} -t ${REPO_NAME}/${APP_NAME}:latest ./flask-code"
         }
       }
     }
@@ -47,13 +46,13 @@ pipeline {
         }
       }
     }
-    // stage('Trigger Manifest Update') {
-    //   steps {
-    //         stage('Trigger Manifest Update') {
-    //         echo "triggering updatemanifestjob"
-    //         build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-    //     }
-    //   }
-    // }
+    stage('Trigger Manifest Update') {
+      steps {
+            stage('Trigger Manifest Update') {
+            echo "triggering updatemanifestjob"
+            build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+        }
+      }
+    }
   }
 }
