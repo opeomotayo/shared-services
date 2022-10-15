@@ -28,13 +28,13 @@ pipeline {
         }  
       }
     }
-    // stage('Push Image') {
-    //   steps {
-    //         docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-    //         app.push("${env.BUILD_NUMBER}")
-    //     }
-    //   }
-    // }
+    stage('Push Image') {
+      steps {
+            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+            sh "docker push ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG}"
+        }
+      }
+    }
     // stage('Trigger Manifest Update') {
     //   steps {
     //         stage('Trigger Manifest Update') {
