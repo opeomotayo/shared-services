@@ -4,6 +4,7 @@ pipeline {
     APP_NAME = "flask-image"
     REPO_NAME = "opeomotayo"
     IMAGE_TAG = "${env.BUILD_NUMBER}"
+    DOCKER_CRED = "dockerhub"
   }
 
   agent {
@@ -31,10 +32,8 @@ pipeline {
     stage('Push Image') {
       steps {
             script {
-                docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                sh "docker image list"
+                sh "docker login -u DOCKER_CRED.USR -p DOCKER_CRED.PWD"
                 sh "docker push ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG}"
-            }
         }
       }
     }
