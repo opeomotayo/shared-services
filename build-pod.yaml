@@ -14,13 +14,256 @@ spec:
       - cat
       tty: true
     - name: docker
-      image: docker:18.06.1
+      image: docker:20.10.19-dind
       command: ["tail", "-f", "/dev/null"]
       imagePullPolicy: Always
       volumeMounts:
         - name: docker
           mountPath: /var/run/docker.sock # We use the k8s host docker engine
+    - name: gcloud-sdk
+      image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+      imagePullPolicy: Always
+      # works without this
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 300m
+          memory: 300Mi
+          cpu: "1"
+          memory: 1Gi
+    - name: aws-cli
+      image: amazon/aws-cli:2.4.7
+      #imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 300m
+          memory: 300Mi
+        limits:
+          cpu: "1"
+          memory: 1Gi
+    - name: jq
+      image: stedolan/jq
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 500Mi
+    - name: skaffold
+      image: gcr.io/k8s-skaffold/skaffold:v1.27.0
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 500Mi
+    - name: argocd
+      image: argoproj/argocd:v2.0.3
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 500Mi
+    - name: git-kustomize
+      image: harisekhon/git-kustomize:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 500Mi
+    - name: terraform
+      image: hashicorp/terraform:1.1.2  # XXX: set this to match the Terraform version you need
+      #imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 500Mi
+    - name: terragrunt
+      image: alpine/terragrunt:1.1.2  # XXX: set this to match the Terraform version you need
+      #imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 500Mi
+    - name: jfrog-cli
+      image: releases-docker.jfrog.io/jfrog/jfrog-cli-v2:2.10.1
+      #imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 500Mi
+    - name: tfsec
+      #image: aquasec/tfsec:v0.63
+      #image: aquasec/tfsec-ci:latest  # no entrypoint, same version tags as aquasec/tfsec
+      image: aquasec/tfsec:latest      # tfsec-ci not needed since entrypoint is overridden by cat to allow exec'ing into container in Pipeline stages
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 200Mi
+    # ==================================================
+    # https://semgrep.dev/
+    - name: semgrep
+      image: returntocorp/semgrep-agent:v1
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 200Mi
+    # ==================================================
+    # https://hub.docker.com/r/aquasec/trivy
+    - name: trivy
+      #image: aquasec/trivy:0.22.0
+      image: aquasec/trivy:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 200Mi
+    - name: checkov
+      #image: bridgecrew/checkov:2.0.715
+      image: bridgecrew/checkov:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 200Mi
+    - name: kics
+      #image: checkmarx/kics:v1.5.0
+      image: checkmarx/kics:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 200Mi
+    - name: liquibase
+      #image: liquibase/liquibase:4.6
+      image: liquibase/liquibase:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 500m
+          memory: 200Mi
+    - name: busybox
+      #image: busybox:3
+      image: busybox:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 200m
+          memory: 200Mi
+    #- name: golang
+    #  image: golang:1.10
+    #  command:
+    #    - cat
+    #  tty: true
+    - name: megalinter
+      image: megalinter/megalinter:v5
+      imagePullPolicy: Always
+      command:
+        - cat
+      env:
+        - name: VALIDATE_ALL_CODEBASE
+          value: 'true'
+      tty: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 50Mi
+        limits:
+          cpu: 200m
+          memory: 200Mi
+      volumeMounts:
+        #- mountPath: /home/jenkins/agent
+        - mountPath: /tmp/lint
+          name: workspace-volume
+          readOnly: false
   volumes:
     - name: docker
       hostPath:
         path: /var/run/docker.sock
+  
