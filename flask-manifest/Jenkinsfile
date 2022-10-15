@@ -1,10 +1,7 @@
 pipeline {
 
   environment {
-    APP_NAME = "flask-image"
-    REPO_NAME = "opeomotayo"
     IMAGE_TAG = "${env.BUILD_NUMBER}"
-    DOCKER_CRED = "dockerhub"
   }
 
   options {
@@ -14,7 +11,7 @@ pipeline {
   agent {
     kubernetes {
       label 'ci'
-      defaultContainer 'docker'
+      defaultContainer 'jnlp'
       yamlFile 'build-pod.yaml'
     }
   }
@@ -34,7 +31,7 @@ pipeline {
                 sh "sed -i 's+opeomotayo/flask-image.*+opeomotayo/flask-image:${DOCKERTAG}+g' deployment.yaml"
                 sh "cat deployment.yaml"
                 sh "git add ."
-                sh "git commit -m 'Done by Jenkins Job: changing manifest image tag to ${env.BUILD_NUMBER}'"
+                sh "git commit -m 'Done by Jenkins Job: changing manifest image tag to ${IMAGE_TAG}'"
                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/playground-dependency.git HEAD:master"
               }
             }
