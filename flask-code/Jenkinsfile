@@ -1,34 +1,43 @@
-node {
-    def app
+pipeline {
 
-    stage('Clone repository') {
-      
+  environment {
+    IMAGE_TAG = "${env.BUILD_NUMBER}"
+  }
 
-        checkout scm
+  agent {
+    kubernetes {
+      label 'ci'
+      defaultContainer 'docker'
+      yamlFile 'build-pod.yaml'
     }
-
-    stage('Build image') {
-  
-       app = docker.build("raj80dockerid/test")
+  }
+  stages {
+    stage('Build Image') {
+      steps {
+          app = docker.build("opeomotayo/flask-image")
+      }
     }
-
-    stage('Test image') {
-  
-
+    stage('Test') {
+      steps {
         app.inside {
             sh 'echo "Tests passed"'
-        }
+        }  
+      }
     }
-
-    stage('Push image') {
-        
-        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+    stage('Push Image') {
+      steps {
+            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
             app.push("${env.BUILD_NUMBER}")
         }
+      }
     }
-    
-    stage('Trigger ManifestUpdate') {
-                echo "triggering updatemanifestjob"
-                build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+    stage('Trigger Manifest Update') {
+      steps {
+            stage('Trigger Manifest Update') {
+            echo "triggering updatemanifestjob"
+            build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
         }
+      }
+    }
+  }
 }
