@@ -14,12 +14,20 @@ spec:
       - cat
       tty: true
     - name: docker
-      image: docker:20.10.19-dind
-      command: ["tail", "-f", "/dev/null"]
-      imagePullPolicy: Always
+      image: docker:19.03.11-dind
+      tty: true
+      securityContext:
+        privileged: true
       volumeMounts:
-        - name: docker
-          mountPath: /var/run/docker.sock # We use the k8s host docker engine
+        - name: docker-storage
+          mountPath: /var/lib/docker
+    # - name: docker
+    #   image: docker:20.10.19-dind
+    #   command: ["tail", "-f", "/dev/null"]
+    #   imagePullPolicy: Always
+    #   volumeMounts:
+    #     - name: docker
+    #       mountPath: /var/run/docker.sock # We use the k8s host docker engine
     - name: gcloud-sdk
       image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
       imagePullPolicy: Always
@@ -229,13 +237,6 @@ spec:
       command:
         - cat
       tty: true
-      resources:
-        requests:
-          cpu: 50m
-          memory: 50Mi
-        limits:
-          cpu: 200m
-          memory: 200Mi
     #- name: golang
     #  image: golang:1.10
     #  command:
@@ -250,20 +251,16 @@ spec:
         - name: VALIDATE_ALL_CODEBASE
           value: 'true'
       tty: true
-      resources:
-        requests:
-          cpu: 50m
-          memory: 50Mi
-        limits:
-          cpu: 200m
-          memory: 200Mi
       volumeMounts:
         #- mountPath: /home/jenkins/agent
         - mountPath: /tmp/lint
           name: workspace-volume
           readOnly: false
+  # volumes:
+  #   - name: docker
+  #     hostPath:
+  #       path: /var/run/docker.sock
   volumes:
-    - name: docker
-      hostPath:
-        path: /var/run/docker.sock
+    - name: docker-storage
+      emptyDir: {}
   
