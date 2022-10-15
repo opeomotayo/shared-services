@@ -16,7 +16,7 @@ spec:
         app: flask-app
     spec:
       containers:
-      - image: opeomotayo/flask-image:63
+      - image: opeomotayo/flask-image:64
         name: flask-app
         resources: {}
 status: {}
