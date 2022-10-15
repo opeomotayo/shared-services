@@ -1,7 +1,7 @@
 ## What this does?
-This repo demonstrates how to create Jenkinsfile to build and push a docker image, tagged with custom build number or latest
+This repo along with https://github.com/saha-rajdeep/kubernetesmanifest creates a Jenkins pipeline with GitOps to deploy code into a Kubernetes cluster. CI part is done via Jenkins and CD part via ArgoCD (GitOps).
 
-## Jenkins setup
+## Jenkins installation
 Jenkins is installed on EC2. Follow the instructions on https://www.jenkins.io/doc/tutorials/tutorial-for-installing-jenkins-on-AWS/ . You can skip "Configure a Cloud" part for this demo. Please note some commands from this link might give errors, below are the workarounds:
 
 1. If you get daemonize error while running the command `sudo yum install jenkins java-1.8.0-openjdk-devel -y` then , run the commands from the answer of https://stackoverflow.com/questions/68806741/how-to-fix-yum-update-of-jenkins
@@ -19,6 +19,11 @@ Install the following plugins for the demo.
 - Docker plugin  
 - Docker Pipeline
 - GitHub Integration Plugin
+- Parameterized trigger Plugin
+
+## ArgoCD installation 
+
+Install ArgoCD in your Kubernetes cluster following this link - https://argo-cd.readthedocs.io/en/stable/getting_started/
 
 ## How to run!
-Follow along with my Udemy DevOps course lectures to understand how it works, detailed setup instructions, with step by step demo. My highest rated, discounted Udemy courses link on www.cloudwithraj.com
+Follow along with my Udemy Kubernetes course lectures (GitOps Chapter) to understand how it works, detailed setup instructions, with step by step demo. My highest rated Kubernetes EKS discounted Udemy course link in www.cloudwithraj.com
