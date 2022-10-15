@@ -7,6 +7,11 @@ pipeline {
     DOCKER_CRED = "dockerhub"
   }
 
+  options {
+      buildDiscarder(logRotator(numToKeepStr: '5'))
+      timestamps()
+   }
+
   agent {
     kubernetes {
       label 'ci'
@@ -14,6 +19,7 @@ pipeline {
       yamlFile 'build-pod.yaml'
     }
   }
+
   stages {
     stage('Build Image') {
       steps {
@@ -31,9 +37,11 @@ pipeline {
     }
     stage('Push Image') {
       steps {
-            script {
-                sh "docker login -u DOCKER_CRED.USR -p DOCKER_CRED.PWD"
-                sh "docker push ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG}"
+        script {
+            docker.withRegistry("", "dockerhub") {
+                def image = docker.image("${REPO_NAME}/${APP_NAME}:${IMAGE_TAG}");
+                image.push()
+            }
         }
       }
     }
