@@ -5,12 +5,12 @@ pipeline {
   }
 
   options {
-      buildDiscarder(logRotator(numToKeepStr: '5'))
+      buildDiscarder(logRotator(numToKeepStr: '3'))
    }
 
   agent {
     kubernetes {
-      label 'ci'
+      label 'update-manifest'
       defaultContainer 'jnlp'
       yamlFile 'build-pod.yaml'
     }

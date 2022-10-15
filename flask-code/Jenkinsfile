@@ -8,12 +8,12 @@ pipeline {
   }
 
   options {
-      buildDiscarder(logRotator(numToKeepStr: '5'))
+      buildDiscarder(logRotator(numToKeepStr: '3'))
    }
 
   agent {
     kubernetes {
-      label 'ci'
+      label 'build-image'
       defaultContainer 'docker'
       yamlFile 'build-pod.yaml'
     }
