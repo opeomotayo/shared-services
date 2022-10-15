@@ -24,9 +24,9 @@ status: {}
 apiVersion: v1
 kind: Service
 metadata:
-  name: flask-service
+  name: lb-service
   labels:
-    app: flask-service
+    app: lb-service
 spec:
   type: LoadBalancer
   ports:
