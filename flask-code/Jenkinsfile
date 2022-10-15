@@ -39,8 +39,8 @@ pipeline {
     stage('Push Image') {
       steps {
         script {
-            docker.withRegistry("", "dockerhub") {
-                def image = docker.image("${REPO_NAME}/${APP_NAME}:${IMAGE_TAG}");
+            docker.withRegistry("https://registry.hub.docker.com", "dockerhub") {
+                def image = docker.image("${IMAGE_TAG}");
                 image.push()
             }
         }
