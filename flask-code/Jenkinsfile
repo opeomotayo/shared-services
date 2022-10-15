@@ -17,7 +17,7 @@ pipeline {
     stage('Build Image') {
       steps {
         script {
-            sh "docker build -t ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG} -t ${REPO_NAME}/${APP_NAME}:latest ."
+            sh "docker build -t ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG} -t ${REPO_NAME}/${APP_NAME}:latest ./flast-code"
         }
       }
     }
