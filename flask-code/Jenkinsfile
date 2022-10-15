@@ -1,7 +1,8 @@
 pipeline {
 
   environment {
-    APP_NAME = flask-image
+    APP_NAME = "flask-image"
+    REPO_NAME = "opeomotayo"
     IMAGE_TAG = "${env.BUILD_NUMBER}"
   }
 
@@ -16,7 +17,7 @@ pipeline {
     stage('Build Image') {
       steps {
         script {
-            sh "docker build -t ${IMAGE_TAG} -t opeomotayo/${APP_NAME}:latest ."
+            sh "docker build -t ${REPO_NAME}/${APP_NAME}:${IMAGE_TAG} -t ${REPO_NAME}/${APP_NAME}:latest ."
         }
       }
     }
