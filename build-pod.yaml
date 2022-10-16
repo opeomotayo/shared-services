@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins # a service account that can deploy to all namespaces
+  containers:  # a list of containers that you want present for your build, you can define a default container in the Jenkinsfile
+    - name: kubectl
+      image: gcr.io/cloud-builders/kubectl
+      command:
+      - cat
+      tty: true
+    - name: node
+      image: node:10
+      command:
+      - cat
+      tty: true
+    - name: docker
+      image: docker:latest
+      command: ["tail", "-f", "/dev/null"]
+      imagePullPolicy: Always
+      volumeMounts:
+        - name: docker
+          mountPath: /var/run/docker.sock # We use the k8s host docker engine
+    - name: gcloud-sdk
+      image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+      imagePullPolicy: Always
+      # works without this
+      command:
+        - cat
+      tty: true
+    - name: aws-cli
+      image: amazon/aws-cli:2.4.7
+      #imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    - name: jq
+      image: stedolan/jq
+      command:
+        - cat
+      tty: true
+    - name: skaffold
+      image: gcr.io/k8s-skaffold/skaffold:v1.27.0
+      command:
+        - cat
+      tty: true
+    - name: git-kustomize
+      image: harisekhon/git-kustomize:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    - name: terraform
+      image: hashicorp/terraform:1.1.2  # XXX: set this to match the Terraform version you need
+      #imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    - name: tfsec
+      #image: aquasec/tfsec:v0.63
+      #image: aquasec/tfsec-ci:latest  # no entrypoint, same version tags as aquasec/tfsec
+      image: aquasec/tfsec:latest      # tfsec-ci not needed since entrypoint is overridden by cat to allow exec'ing into container in Pipeline stages
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    # ==================================================
+    # https://semgrep.dev/
+    - name: semgrep
+      image: returntocorp/semgrep-agent:v1
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    # ==================================================
+    # https://hub.docker.com/r/aquasec/trivy
+    - name: trivy
+      #image: aquasec/trivy:0.22.0
+      image: aquasec/trivy:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    - name: checkov
+      #image: bridgecrew/checkov:2.0.715
+      image: bridgecrew/checkov:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    - name: kics
+      #image: checkmarx/kics:v1.5.0
+      image: checkmarx/kics:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    - name: liquibase
+      #image: liquibase/liquibase:4.6
+      image: liquibase/liquibase:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
+    #- name: golang
+    #  image: golang:1.10
+    #  command:
+    #    - cat
+    #  tty: true
+    - name: megalinter
+      image: megalinter/megalinter:v5
+      imagePullPolicy: Always
+      command:
+        - cat
+      env:
+        - name: VALIDATE_ALL_CODEBASE
+          value: 'true'
+      tty: true
+      volumeMounts:
+        #- mountPath: /home/jenkins/agent
+        - mountPath: /tmp/lint
+          name: workspace-volume
+          readOnly: false
+  volumes:
+    - name: docker
+      hostPath:
+        path: /var/run/docker.sock
+  
