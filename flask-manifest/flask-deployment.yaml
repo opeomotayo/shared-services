@@ -9,7 +9,6 @@ spec:
   selector:
     matchLabels:
       app: flask-app
-  strategy: {}
   template:
     metadata:
       labels:
@@ -18,7 +17,4 @@ spec:
       containers:
       - image: opeomotayo/flask-image:81
         name: flask-app
-        resources: {}
-status: {}
----
 

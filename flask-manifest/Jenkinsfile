@@ -24,8 +24,8 @@ pipeline {
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
               withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                 //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
-                sh "git config user.email manifest_updater_bot@gmail.com"
-                sh "git config user.name manifest_updater_bot"
+                sh "git config user.email opeomotayo@gmail.com"
+                sh "git config user.name opeomotayo"
                 //sh "git switch master"
                 sh "cat flask-deployment.yaml"
                 sh "sed -i 's+opeomotayo/flask-image.*+opeomotayo/flask-image:${DOCKERTAG}+g' flask-deployment.yaml"
