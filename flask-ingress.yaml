@@ -13,7 +13,7 @@ spec:
       paths:
       - backend:
           service:
-                  name: flask-service
+            name: flask-service
             port:
               number: 8080
         path: /
