@@ -24,12 +24,12 @@ pipeline {
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
               withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                 //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
-                sh "git config user.email opeomotayo@gmail.com"
-                sh "git config user.name opeomotayo"
+                sh "git config user.email manifest_updater_bot@gmail.com"
+                sh "git config user.name manifest_updater_bot"
                 //sh "git switch master"
-                sh "cat deployment.yaml"
-                sh "sed -i 's+opeomotayo/flask-image.*+opeomotayo/flask-image:${DOCKERTAG}+g' deployment.yaml"
-                sh "cat deployment.yaml"
+                sh "cat flask-deployment.yaml"
+                sh "sed -i 's+opeomotayo/flask-image.*+opeomotayo/flask-image:${DOCKERTAG}+g' flask-deployment.yaml"
+                sh "cat flask-deployment.yaml"
                 sh "git add ."
                 sh "git commit -m 'Done by Jenkins Job: changing manifest image tag to ${IMAGE_TAG}'"
                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/playground-dependency.git HEAD:master"
