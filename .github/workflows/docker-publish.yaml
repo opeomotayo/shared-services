@@ -51,8 +51,9 @@ jobs:
       - name: Sign the published Docker image
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: cosign sign --key cosign.key ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
-
+        run: |
+          cosign sign --key cosign.key ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
+          
       - name: Write signing key to disk
         run: 'echo "$KEY" > cosign.pubkey'
         shell: bash
@@ -62,4 +63,8 @@ jobs:
       - name: Verify the published Docker image
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: cosign verify --key cosign.pubkey ghcr.io/opeomotayo/signedcontainer:3283947976
+        run: | 
+          cosign verify --key cosign.pubkey ghcr.io/opeomotayo/signedcontainer:3283947976
+          cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq '.[0]'"
+          echo "::notice title=Inspect signature cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
+          echo "::notice title=Inspect cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq -r '.[0].opt
