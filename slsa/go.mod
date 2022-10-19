@@ -1,4 +1,4 @@
-module github.com/marcofranssen/slsa-workflow-example
+module github.com/opeomotayo/playground-dependency
 
 go 1.17
 
