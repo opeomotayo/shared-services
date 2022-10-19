@@ -173,11 +173,11 @@ jobs:
         with:
           command: generate
           subcommand: container
-          arguments: --repository "${IMAGE_NAME}" --output-path "${PROVENANCE_FILE}" --digest "${IMAGE_DIGEST}" --tags "${IMAGE_TAGS}"
+          arguments: --repository "${IMAGE_NAME}" --output-path "${PROVENANCE_FILE}" --digest "${IMAGE_DIGEST}" --tags '3285063706'
         env:
           COSIGN_EXPERIMENTAL: 0
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          IMAGE_TAGS: "${IMAGE_TAGS}"
+          IMAGE_TAGS: '3285063706'
 
       - name: Login to ghcr.io
         uses: docker/login-action@v1.14.1
