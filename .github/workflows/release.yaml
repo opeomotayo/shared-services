@@ -1,98 +1,98 @@
-name: Release
+  name: Release
 
-on:
-  push:
-    tags:
-      - v**
+  on:
+    push:
+      tags:
+        - v**
 
-env:
-  COSIGN_EXPERIMENTAL: 1
-  IMAGE_NAME: ghcr.io/opeomotayo/playground-dependency-docker
+  env:
+    COSIGN_EXPERIMENTAL: 1
+    IMAGE_NAME: ghcr.io/opeomotayo/playground-dependency-docker
 
-jobs:
-  docker:
-    runs-on: ubuntu-20.04
+  jobs:
+    docker:
+      runs-on: ubuntu-20.04
 
-    permissions:
-      packages: write
+      permissions:
+        packages: write
 
-    outputs:
-      image-digest: ${{ steps.container_info.outputs.image-digest }}
+      outputs:
+        image-digest: ${{ steps.container_info.outputs.image-digest }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.0.0
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3.0.0
 
-      - name: Login to ghcr.io
-        uses: docker/login-action@v1.14.1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        - name: Login to ghcr.io
+          uses: docker/login-action@v1.14.1
+          with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker images
-        run: |
-          revision="$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
-          docker build \
-            -t "${IMAGE_NAME}:latest" \
-            -t "${IMAGE_NAME}:${GITHUB_REF_NAME}" \
-            -t "${IMAGE_NAME}:${revision}" \
-            --label "org.opencontainers.image.source=https://github.com/opeomotayo/playground-dependency" \
-            --label "org.opencontainers.image.created=$(date --iso-8601=seconds)" \
-            --label "org.opencontainers.image.title=slsa-workflow-examples-docker" \
-            --label "org.opencontainers.image.revision=${revision}" \
-            --label "org.opencontainers.image.version=${GITHUB_REF_NAME}" \
-            --label "org.opencontainers.image.licenses=MIT" \
-            --label "org.opencontainers.image.vendor=Ope Omotayo" \
-            ./slsa
+        - name: Build Docker images
+          run: |
+            revision="$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
+            docker build \
+              -t "${IMAGE_NAME}:latest" \
+              -t "${IMAGE_NAME}:${GITHUB_REF_NAME}" \
+              -t "${IMAGE_NAME}:${revision}" \
+              --label "org.opencontainers.image.source=https://github.com/opeomotayo/playground-dependency" \
+              --label "org.opencontainers.image.created=$(date --iso-8601=seconds)" \
+              --label "org.opencontainers.image.title=slsa-workflow-examples-docker" \
+              --label "org.opencontainers.image.revision=${revision}" \
+              --label "org.opencontainers.image.version=${GITHUB_REF_NAME}" \
+              --label "org.opencontainers.image.licenses=MIT" \
+              --label "org.opencontainers.image.vendor=Ope Omotayo" \
+              ./slsa
 
-      - name: Publish Docker images
-        run: docker push "${IMAGE_NAME}" --all-tags
+        - name: Publish Docker images
+          run: docker push "${IMAGE_NAME}" --all-tags
 
-      - name: Get container info
-        id: container_info
-        run: |
-          image_digest="$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
-          echo "::set-output name=image-digest::${image_digest}"
+        - name: Get container info
+          id: container_info
+          run: |
+            image_digest="$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+            echo "::set-output name=image-digest::${image_digest}"
 
-  sign:
-    runs-on: ubuntu-20.04
-    needs: [docker]
+    sign:
+      runs-on: ubuntu-20.04
+      needs: [docker]
 
-    permissions:
-      packages: write
-      id-token: write
+      permissions:
+        packages: write
+        id-token: write
 
-    env:
-      IMAGE_DIGEST: ${{ needs.docker.outputs.image-digest }}
+      env:
+        IMAGE_DIGEST: ${{ needs.docker.outputs.image-digest }}
 
-    steps:
-      uses: sigstore/cosign-installer@1e95c1de343b5b0c23352d6417ee3e48d5bcd422
-        with:
-          cosign-release: 'v1.4.0'
-      
-      # - name: Sign the published Docker image
-      #   env:
-      #     COSIGN_EXPERIMENTAL: "true"
-      #   # This step uses the identity token to provision an ephemeral certificate
-      #   # against the sigstore community Fulcio instance.
-      #   run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ IMAGE_DIGEST }}
-      
-      # - name: Install cosign
-      #   uses: sigstore/cosign-installer@v2.1.0
-      #   with:
-      #     cosign-release: v1.6.0
+      steps:
+        uses: sigstore/cosign-installer@1e95c1de343b5b0c23352d6417ee3e48d5bcd422
+          with:
+            cosign-release: 'v1.4.0'
+        
+        # - name: Sign the published Docker image
+        #   env:
+        #     COSIGN_EXPERIMENTAL: "true"
+        #   # This step uses the identity token to provision an ephemeral certificate
+        #   # against the sigstore community Fulcio instance.
+        #   run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ IMAGE_DIGEST }}
+        
+        # - name: Install cosign
+        #   uses: sigstore/cosign-installer@v2.1.0
+        #   with:
+        #     cosign-release: v1.6.0
 
-      # - name: Login to ghcr.io
-      #   uses: docker/login-action@v1.14.1
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
+        # - name: Login to ghcr.io
+        #   uses: docker/login-action@v1.14.1
+        #   with:
+        #     registry: ghcr.io
+        #     username: ${{ github.actor }}
+        #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Sign image
-      #   run: |
-      #     cosign sign "${IMAGE_NAME}@${IMAGE_DIGEST}"
-      #     echo "::notice title=Verify signature::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0]'"
-      #     echo "::notice title=Inspect signature bundle::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
-      #     echo "::notice title=Inspect certificate::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
+        # - name: Sign image
+        #   run: |
+        #     cosign sign "${IMAGE_NAME}@${IMAGE_DIGEST}"
+        #     echo "::notice title=Verify signature::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0]'"
+        #     echo "::notice title=Inspect signature bundle::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
+        #     echo "::notice title=Inspect certificate::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
