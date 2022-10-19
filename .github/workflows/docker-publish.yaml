@@ -66,5 +66,5 @@ jobs:
         run: | 
           cosign verify --key cosign.pubkey ghcr.io/opeomotayo/signedcontainer:3283947976
           cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
-          # echo "::notice title=Inspect signature cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
+          echo "::notice title=Inspect signature cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
           # echo "::notice title=Inspect cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq -r '.[0].opt
