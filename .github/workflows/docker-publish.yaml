@@ -18,6 +18,9 @@ jobs:
 
     outputs:
       image-url: ${{ steps.container_info.outputs.image-url }}
+      image-name: ${{ steps.container_info.outputs.image-name }}
+      image-digest: ${{ steps.container_info.outputs.image-digest }}
+      image-tag: ${{ steps.container_info.outputs.image-tag }}
 
     steps:
       - name: Checkout repository
@@ -44,8 +47,12 @@ jobs:
       - name: Get container info
         id: container_info
         run: |
-          image_url="${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-          echo "::set-output name=image-url::${image_url}"
+          echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
+          echo "::set-output name=image-name::${{ env.IMAGE_NAME }}"
+          echo "::set-output name=image-digest::$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+          echo "::set-output name=image-tag::latest,${GITHUB_REF_NAME},$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
+          echo "::set-output name=image-tag2::${{ github.run_id }}"
+
     
   image_sign:
     runs-on: ubuntu-latest
@@ -152,9 +159,9 @@ jobs:
 
     env:
       IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
-      IMAGE_NAME: 'ghcr.io/opeomotayo/signedcontainer'
-      IMAGE_DIGEST: ${{ needs.image_build.outputs.image-url }}
-      IMAGE_TAG: ${{ needs.image_build.outputs.image-url }}
+      IMAGE_NAME: ${{ needs.image_build.outputs.image-name }}
+      IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }}
+      IMAGE_TAG: ${{ needs.image_build.outputs.image-tag }}
       PROVENANCE_FILE: provenance.att
 
     steps:
