@@ -47,11 +47,11 @@ jobs:
       - name: Get container info
         id: container_info
         run: |
+          image_digest="$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+          echo "::set-output name=image-digest::${image_digest}"
           echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
           echo "::set-output name=image-name::${{ env.IMAGE_NAME }}"
-          echo "::set-output name=image-digest::$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
-          echo "::set-output name=image-tag::latest,${GITHUB_REF_NAME},$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
-          echo "::set-output name=image-tag2::${{ github.run_id }}"
+          echo "::set-output name=image-tag::${{ github.run_id }}"
 
     
   image_sign:
