@@ -191,3 +191,4 @@ jobs:
           cosign attest --key cosign.key --predicate provenance-predicate.att --type slsaprovenance "${IMAGE_NAME}@${IMAGE_DIGEST}"
           echo "::notice title=Verify provenance attestation cosign verify-attestation --key cosign.key ${IMAGE_NAME}@${IMAGE_DIGEST}"
           echo "::notice title=Download provenance attestation cosign download attestation --key cosign.key ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://slsa.dev/provenance/v0.2\")'"
+
