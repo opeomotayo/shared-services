@@ -6,7 +6,7 @@ on:
       - v**
 
 env:
-  IMAGE_NAME: ghcr.io/marcofranssen/slsa-workflow-examples-docker
+  IMAGE_NAME: ghcr.io/opeomotayo/playground-dependency
 
 jobs:
   docker:
@@ -33,13 +33,13 @@ jobs:
             -t "${IMAGE_NAME}:latest" \
             -t "${IMAGE_NAME}:${GITHUB_REF_NAME}" \
             -t "${IMAGE_NAME}:${revision}" \
-            --label "org.opencontainers.image.source=https://github.com/marcofranssen/slsa-workflow-examples" \
+            --label "org.opencontainers.image.source=https://github.com/opeomotayo/playground-dependency" \
             --label "org.opencontainers.image.created=$(date --iso-8601=seconds)" \
-            --label "org.opencontainers.image.title=slsa-workflow-examples-docker" \
+            --label "org.opencontainers.image.title=playground-dependency" \
             --label "org.opencontainers.image.revision=${revision}" \
             --label "org.opencontainers.image.version=${GITHUB_REF_NAME}" \
             --label "org.opencontainers.image.licenses=MIT" \
-            --label "org.opencontainers.image.vendor=Marco Franssen" \
+            --label "org.opencontainers.image.vendor=Ope Omotayo" \
             .
 
       - name: Publish Docker images
