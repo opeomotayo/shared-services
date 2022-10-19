@@ -67,21 +67,33 @@ jobs:
       IMAGE_DIGEST: ${{ needs.docker.outputs.image-digest }}
 
     steps:
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v2.1.0
+      uses: sigstore/cosign-installer@1e95c1de343b5b0c23352d6417ee3e48d5bcd422
         with:
-          cosign-release: v1.6.0
+          cosign-release: 'v1.4.0'
+      
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ IMAGE_DIGEST }}
+      
+      # - name: Install cosign
+      #   uses: sigstore/cosign-installer@v2.1.0
+      #   with:
+      #     cosign-release: v1.6.0
 
-      - name: Login to ghcr.io
-        uses: docker/login-action@v1.14.1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to ghcr.io
+      #   uses: docker/login-action@v1.14.1
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Sign image
-        run: |
-          cosign sign "${IMAGE_NAME}@${IMAGE_DIGEST}"
-          echo "::notice title=Verify signature::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0]'"
-          echo "::notice title=Inspect signature bundle::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
-          echo "::notice title=Inspect certificate::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
+      # - name: Sign image
+      #   run: |
+      #     cosign sign "${IMAGE_NAME}@${IMAGE_DIGEST}"
+      #     echo "::notice title=Verify signature::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0]'"
+      #     echo "::notice title=Inspect signature bundle::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
+      #     echo "::notice title=Inspect certificate::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}@${IMAGE_DIGEST} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
