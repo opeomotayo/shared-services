@@ -53,6 +53,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      # id-token: write
 
     env:
       IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
@@ -139,3 +140,54 @@ jobs:
         run: echo ::set-output name=sbomfile::$(cat sbom-spdx.json)
       - name: Test output
         run: echo ${{ steps.vars.outputs.sbomfile }}
+
+  image_provenance:
+    runs-on: ubuntu-latest
+    needs: [image_build]
+
+    permissions:
+      contents: read
+      packages: write
+      # id-token: write
+
+    env:
+      IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
+      IMAGE_NAME: ghcr.io/opeomotayo/signedcontainer
+      IMAGE_DIGEST: "$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+      IMAGE_TAG: "latest,${GITHUB_REF_NAME},$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
+      PROVENANCE_FILE: provenance.att
+
+    steps:
+      - name: cosign-installer
+        uses: sigstore/cosign-installer@v2.0.0
+
+      - name: Generate provenance
+        uses: philips-labs/slsa-provenance-action@v0.7.2
+        with:
+          command: generate
+          subcommand: container
+          arguments: --repository "${IMAGE_NAME}" --output-path "${PROVENANCE_FILE}" --digest "${IMAGE_DIGEST}" --tags "${IMAGE_TAG}"
+        env:
+          COSIGN_EXPERIMENTAL: 0
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          IMAGE_TAG: "${IMAGE_TAG}"
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v1.14.1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write signing key to disk
+        run: 'echo "$KEY" > cosign.key'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+
+      - name: Attach provenance
+        run: |
+          jq '.predicate' "${PROVENANCE_FILE}" > provenance-predicate.att
+          cosign attest --key cosign.key --predicate provenance-predicate.att --type slsaprovenance "${IMAGE_NAME}@${IMAGE_DIGEST}"
+          echo "::notice title=Verify provenance attestation cosign verify-attestation --key cosign.key ${IMAGE_NAME}@${IMAGE_DIGEST}"
+          echo "::notice title=Download provenance attestation cosign download attestation --key cosign.key ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://slsa.dev/provenance/v0.2\")'"
