@@ -52,3 +52,14 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: cosign sign --key cosign.key ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
+
+      - name: Write signing key to disk
+        run: 'echo "$KEY" > cosign.pubkey'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
+      
+      - name: Verify the published Docker image
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: cosign verify --key cosign.pubkey ghcr.io/opeomotayo/signedcontainer:3283947976
