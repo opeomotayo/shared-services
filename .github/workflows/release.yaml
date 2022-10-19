@@ -2,10 +2,11 @@ name: Release
 
 on:
   push:
-   # tags:
-   # - v**
+    tags:
+      - v**
 
 env:
+  COSIGN_EXPERIMENTAL: 1
   IMAGE_NAME: ghcr.io/opeomotayo/playground-dependency
 
 jobs:
@@ -14,6 +15,10 @@ jobs:
 
     permissions:
       packages: write
+
+    outputs:
+      image-digest: ${{ steps.container_info.outputs.image-digest }}
+      image-tags: ${{ steps.container_info.outputs.image-tags }}
 
     steps:
       - name: Checkout
@@ -43,4 +48,45 @@ jobs:
             ./slsa
 
       - name: Publish Docker images
-        run: docker push "${IMAGE_NAME}" #--all-tags
+        run: docker push "${IMAGE_NAME}" --all-tags
+
+      - name: Get container info
+        id: container_info
+        run: |
+          image_digest="$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+          image_tags="latest,${GITHUB_REF_NAME},$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
+          echo "::set-output name=image-digest::${image_digest}"
+          echo "::set-output name=image-tags::${image_tags}"
+
+  sign:
+    runs-on: ubuntu-20.04
+    needs: [docker]
+
+    permissions:
+      packages: write
+      id-token: write
+
+    env:
+      IMAGE_DIGEST: ${{ needs.docker.outputs.image-digest }}
+
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v2.1.0
+        with:
+          cosign-release: v1.6.0
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v1.14.1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sign image
+        run: |
+          cosign sign "${IMAGE_NAME}@${IMAGE_DIGEST}"
+          echo "::notice title=Verify signature::COSIGN_EXPERIMENTAL=1 cosign verify ${IMAGE_NAME}:${GITHUB_REF_NAME} | jq '.[0]'"
+          echo "::notice title=Download signatures::COSIGN_EXPERIMENTAL=1 cosign download signature ${IMAGE_NAME}:${GITHUB_REF_NAME} | jq -s ."
+          echo "::notice title=Inspect signature bundle::COSIGN_EXPERIMENTAL=1 cosign download signature ${IMAGE_NAME}:${GITHUB_REF_NAME} | jq -s '.Bundle.Payload.body |= @base64d | .[0].Bundle.Payload.body | fromjson'"
+          echo "::notice title=Inspect certificates::COSIGN_EXPERIMENTAL=1 cosign download signature ${IMAGE_NAME}:${GITHUB_REF_NAME} | jq -r '.Bundle.Payload.body |= @base64d | .Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
+
