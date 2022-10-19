@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-production
+  namespace: flask
+spec:
+  acme:
+    # Staging API
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: opeomotayo@gmail.com
+    privateKeySecretRef:
+      name: account-key-production
+    solvers:
+    - http01:
+       ingress:
+         class: nginx
