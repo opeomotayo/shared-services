@@ -40,7 +40,7 @@ jobs:
             --label "org.opencontainers.image.version=${GITHUB_REF_NAME}" \
             --label "org.opencontainers.image.licenses=MIT" \
             --label "org.opencontainers.image.vendor=Ope Omotayo" \
-            ./
+            ./slsa
 
       - name: Publish Docker images
         run: docker push "${IMAGE_NAME}" --all-tags
