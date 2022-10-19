@@ -55,6 +55,13 @@ jobs:
       IMAGE_URL: ${{ needs.imagebuild.outputs.image-url }}
       
     steps:
+      - name: Log into registry
+        uses: docker/login-action@v1.12.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: cosign-installer
         uses: sigstore/cosign-installer@v2.0.0
         
