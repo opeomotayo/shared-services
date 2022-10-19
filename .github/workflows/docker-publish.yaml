@@ -54,6 +54,7 @@ jobs:
     env:
       IMAGE_URL: ${{ needs.imagebuild.outputs.image-url }}
       
+    steps:
       - name: cosign-installer
         uses: sigstore/cosign-installer@v2.0.0
         
