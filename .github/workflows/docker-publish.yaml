@@ -161,7 +161,7 @@ jobs:
       IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
       IMAGE_NAME: ghcr.io/opeomotayo/signedcontainer
       IMAGE_DIGEST: sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
-      IMAGE_TAG: 3285063706
+      IMAGE_TAGS: '3285063706'
       PROVENANCE_FILE: provenance.att
 
     steps:
@@ -173,11 +173,11 @@ jobs:
         with:
           command: generate
           subcommand: container
-          arguments: --repository "${IMAGE_NAME}" --output-path "${PROVENANCE_FILE}" --digest "${IMAGE_DIGEST}" --tags "${IMAGE_TAG}"
+          arguments: --repository "${IMAGE_NAME}" --output-path "${PROVENANCE_FILE}" --digest "${IMAGE_DIGEST}" --tags "${IMAGE_TAGS}"
         env:
           COSIGN_EXPERIMENTAL: 0
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          IMAGE_TAG: "${IMAGE_TAG}"
+          IMAGE_TAGS: "${IMAGE_TAGS}"
 
       - name: Login to ghcr.io
         uses: docker/login-action@v1.14.1
