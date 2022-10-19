@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags:
-      - v**
+   # tags:
+   # - v**
 
 env:
   IMAGE_NAME: ghcr.io/opeomotayo/playground-dependency
@@ -43,4 +43,4 @@ jobs:
             ./slsa
 
       - name: Publish Docker images
-        run: docker push "${IMAGE_NAME}" --all-tags
+        run: docker push "${IMAGE_NAME}" #--all-tags
