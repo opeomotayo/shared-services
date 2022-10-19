@@ -10,12 +10,14 @@ env:
   IMAGE_NAME: signedcontainer
 
 jobs:
-  build:
-
+  imagebuild:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+
+    outputs:
+      image-url: ${{ steps.container_info.outputs.image-url }}
 
     steps:
       - name: Checkout repository
@@ -39,6 +41,19 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
       
+      - name: Get container info
+        id: container_info
+        run: |
+          image_url="${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
+          echo "::set-output name=image-url::${image_url}"
+    
+  imagesign:
+    runs-on: ubuntu-latest
+    needs: [imagebuild]
+
+    env:
+      IMAGE_URL: ${{ needs.imagebuild.outputs.image-url }}
+      
       - name: cosign-installer
         uses: sigstore/cosign-installer@v2.0.0
         
@@ -52,7 +67,7 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key cosign.key ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
+          cosign sign --key cosign.key ${IMAGE_URL}
 
       - name: Write signing key to disk
         run: 'echo "$KEY" > cosign.pubkey'
@@ -64,6 +79,6 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: | 
-          echo "::notice title=Verify signature cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq '.[0]'"
-          echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
-          echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} | jq -r '.[0].opt
+          echo "::notice title=Verify signature cosign verify --key cosign.pubkey ${IMAGE_URL} | jq '.[0]'"
+          echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${IMAGE_URL} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
+          echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${IMAGE_URL} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
