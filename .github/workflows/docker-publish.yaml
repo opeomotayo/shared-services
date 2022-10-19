@@ -12,9 +12,6 @@ env:
 jobs:
   imagebuild:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     outputs:
       image-url: ${{ steps.container_info.outputs.image-url }}
@@ -50,6 +47,9 @@ jobs:
   imagesign:
     runs-on: ubuntu-latest
     needs: [imagebuild]
+    permissions:
+      contents: read
+      packages: write
 
     env:
       IMAGE_URL: ${{ needs.imagebuild.outputs.image-url }}
@@ -61,7 +61,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: cosign-installer
         uses: sigstore/cosign-installer@v2.0.0
         
