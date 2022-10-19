@@ -71,13 +71,12 @@ jobs:
         with:
           cosign-release: 'v1.4.0'
       
-      - name: Sign the published Docker image
-        if: ${{ github.event_name != 'pull_request' }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-        run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ IMAGE_DIGEST }}
+      # - name: Sign the published Docker image
+      #   env:
+      #     COSIGN_EXPERIMENTAL: "true"
+      #   # This step uses the identity token to provision an ephemeral certificate
+      #   # against the sigstore community Fulcio instance.
+      #   run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ IMAGE_DIGEST }}
       
       # - name: Install cosign
       #   uses: sigstore/cosign-installer@v2.1.0
