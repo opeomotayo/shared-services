@@ -152,9 +152,9 @@ jobs:
 
     env:
       IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
-      IMAGE_NAME: ghcr.io/opeomotayo/signedcontainer
-      IMAGE_DIGEST: "$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
-      IMAGE_TAG: "latest,${GITHUB_REF_NAME},$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"
+      IMAGE_NAME: 'ghcr.io/opeomotayo/signedcontainer'
+      IMAGE_DIGEST: ${{ needs.image_build.outputs.image-url }}
+      IMAGE_TAG: ${{ needs.image_build.outputs.image-url }}
       PROVENANCE_FILE: provenance.att
 
     steps:
