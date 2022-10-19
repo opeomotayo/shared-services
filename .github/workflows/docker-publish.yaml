@@ -12,6 +12,9 @@ env:
 jobs:
   imagebuild:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     outputs:
       image-url: ${{ steps.container_info.outputs.image-url }}
