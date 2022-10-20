@@ -20,7 +20,7 @@ jobs:
       image-url: ${{ steps.container_info.outputs.image-url }}
       image-name: ${{ steps.container_info.outputs.image-name }}
       image-digest: ${{ steps.container_info.outputs.image-digest }}
-      image-tag: ${{ steps.container_info.outputs.image-tag }}
+      image-tags: ${{ steps.container_info.outputs.image-tags }}
 
     steps:
       - name: Checkout repository
