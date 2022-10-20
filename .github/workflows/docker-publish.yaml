@@ -50,13 +50,15 @@ jobs:
           echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}
           echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
           echo "::set-output name=image-name::${{ env.IMAGE_NAME }}"
-          echo "::set-output name=image-tag::${{ steps.build-and-push.outputs.tag }}"
+          echo "::set-output name=image-tag::${{ env.IMAGE_TAG }}"
+          echo "::set-output name=image-tag1::${{ github.run_id }}"
 
       - name: Test container output
         run: |
           echo ${{ steps.container_info.outputs.image-url }}
           echo ${{ steps.container_info.outputs.image-name }}
           echo ${{ steps.container_info.outputs.image-tag }}
+          echo ${{ steps.container_info.outputs.image-tag1 }}
           echo ${{ steps.container_info.outputs.image-digest }}
     
   # image_sign:
