@@ -16,9 +16,6 @@ jobs:
       contents: read
       packages: write
 
-    env:
-      IMAGE_URL: ${{ steps.container_info.outputs.image-url }}
-
     outputs:
       image-url: ${{ steps.container_info.outputs.image-url }}
       image-name: ${{ steps.container_info.outputs.image-name }}
@@ -52,7 +49,7 @@ jobs:
         run: |
           # echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}"
           # docker inspect --format='{{index .RepoDigests 0}}' $IMAGE
-          image_digest="$(docker inspect "${IMAGE_URL}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+          image_digest="$(docker inspect "${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
           echo "::set-output name=image-digest::${image_digest}"
           echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
           echo "::set-output name=image-name::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
