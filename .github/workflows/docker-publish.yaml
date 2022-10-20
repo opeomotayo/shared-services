@@ -47,11 +47,11 @@ jobs:
       - name: Get container info
         id: container_info
         run: |
-          image_digest="$(docker inspect "${IMAGE_NAME}:latest" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
-          echo "::set-output name=image-digest::${image_digest}"
+          echo "::set-output name=image-digest::$(docker inspect ${{ steps.build-and-push.outputs.digest }} | jq -r '.[].RepoDigests[0] | split("@") | .[1]')" 
+          echo "::set-output name=image-digest2::$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.IMAGE }} | cut -d'@' -f2)"
           echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
           echo "::set-output name=image-name::${{ env.IMAGE_NAME }}"
-          echo "::set-output name=image-tag::${{ github.run_id }}"
+          echo "::set-output name=image-tag::${{ steps.build-and-push.outputs.tags }}"
 
     
   image_sign:
@@ -160,7 +160,7 @@ jobs:
     env:
       IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
       IMAGE_NAME: ghcr.io/opeomotayo/signedcontainer
-      IMAGE_DIGEST: sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
+      IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }} #sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
       PROVENANCE_FILE: provenance.att
 
     steps:
