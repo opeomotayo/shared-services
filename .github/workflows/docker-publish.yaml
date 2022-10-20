@@ -16,16 +16,11 @@ jobs:
       contents: read
       packages: write
 
-    # outputs:
-    #   image-url: ${{ steps.container_info.outputs.image-url }}
-    #   image-name: ${{ steps.container_info.outputs.image-name }}
-    #   image-digest: ${{ steps.container_info.outputs.image-digest }}
-    #   image-tag: ${{ steps.container_info.outputs.image-tag }}
-
     outputs:
-      container_digest: ${{ steps.container_info.outputs.container_digest }}
-      container_tags: ${{ steps.container_info.outputs.container_tags }}
-      container_repos: ${{ steps.container_info.outputs.container_repos }}
+      image-url: ${{ steps.container_info.outputs.image-url }}
+      image-name: ${{ steps.container_info.outputs.image-name }}
+      image-digest: ${{ steps.container_info.outputs.image-digest }}
+      image-tag: ${{ steps.container_info.outputs.image-tag }}
 
     steps:
       - name: Checkout repository
@@ -49,28 +44,22 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
       
-      # - name: Get container info
-      #   id: container_info
-      #   run: |
-      #     echo "::set-output name=image-digest1::$(docker inspect ${{ steps.build-and-push.outputs.digest }} | jq -r '.[].RepoDigests[0] | split("@") | .[1]')" 
-      #     echo "::set-output name=image-digest::$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.IMAGE }} | cut -d'@' -f2)"
-      #     echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-      #     echo "::set-output name=image-name::${{ env.IMAGE_NAME }}"
-      #     echo "::set-output name=image-tag::${{ steps.build-and-push.outputs.tags }}"
-
       - name: Get container info
         id: container_info
-        if: startsWith(github.ref, 'refs/tags/')
         run: |
-          export CONTAINER_DIGEST=$(make container-digest GITHUB_REF=${{ github.ref_name }})
-          echo "::set-output name=container_digest::$CONTAINER_DIGEST"
-          echo "::set-output name=container_tags::$(make container-tags CONTAINER_DIGEST="${CONTAINER_DIGEST}" | paste -s -d ',' -)"
-          echo "::set-output name=container_repos::$(make container-repos CONTAINER_DIGEST="${CONTAINER_DIGEST}" | jq --raw-input . | jq --slurp -c)"
+          echo "::set-output name=image-digest1::$(docker inspect ${{ steps.build-and-push.outputs.digest }} | jq -r '.[].RepoDigests[0] | split("@") | .[1]')" 
+          echo "::set-output name=image-digest::$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.IMAGE }} | cut -d'@' -f2)"
+          echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
+          echo "::set-output name=image-name::${{ env.IMAGE_NAME }}"
+          echo "::set-output name=image-tag::${{ steps.build-and-push.outputs.tags }}"
+
       - name: Test container output
         run: |
-          echo ${{ steps.container_info.outputs.container_digest }}
-          echo ${{ steps.container_info.outputs.container_tags }}
-          echo ${{ steps.container_info.outputs.container_repos }}
+          echo ${{ steps.container_info.outputs.image-url }}
+          echo ${{ steps.container_info.outputs.image-name }}
+          echo ${{ steps.container_info.outputs.image-tag }}
+          echo ${{ steps.container_info.outputs.image-digest }}
+          echo ${{ steps.container_info.outputs.image-digest1 }}
     
   # image_sign:
   #   runs-on: ubuntu-latest
