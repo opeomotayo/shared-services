@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}"
           echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-          echo "::set-output name=image-name::${{ env.IMAGE_NAME }}"
+          echo "::set-output name=image-name::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
           echo "::set-output name=image-tags::${{ github.run_id }}"
 
       - name: Test container output
