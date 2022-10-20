@@ -47,8 +47,8 @@ jobs:
       - name: Get container info
         id: container_info
         run: |
-          echo "::set-output name=image-digest::$(docker inspect ${{ steps.build-and-push.outputs.digest }} | jq -r '.[].RepoDigests[0] | split("@") | .[1]')" 
-          echo "::set-output name=image-digest2::$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.IMAGE }} | cut -d'@' -f2)"
+          echo "::set-output name=image-digest1::$(docker inspect ${{ steps.build-and-push.outputs.digest }} | jq -r '.[].RepoDigests[0] | split("@") | .[1]')" 
+          echo "::set-output name=image-digest::$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.IMAGE }} | cut -d'@' -f2)"
           echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
           echo "::set-output name=image-name::${{ env.IMAGE_NAME }}"
           echo "::set-output name=image-tag::${{ steps.build-and-push.outputs.tags }}"
@@ -142,7 +142,7 @@ jobs:
           echo "::notice title=Verify SBOM attestation cosign verify-attestation --key cosign.key ${IMAGE_URL}"
           echo "::notice title=Download SBOM attestation cosign download attestation --key cosign.key ${IMAGE_URL} | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://spdx.dev/Document\") | .predicate.Data | fromjson'"
 
-      - name: Get SBOM
+      - name: Show SBOM file
         id: vars
         run: echo ::set-output name=sbomfile::$(cat sbom-spdx.json)
       - name: Test output
@@ -172,7 +172,7 @@ jobs:
         with:
           command: generate
           subcommand: container
-          arguments: --repository "${IMAGE_NAME}" --output-path "${PROVENANCE_FILE}" --digest "${IMAGE_DIGEST}" --tags "IMAGE_TAGS"
+          arguments: --repository "${IMAGE_NAME}" --output-path "${PROVENANCE_FILE}" --digest "${IMAGE_DIGEST}" --tags "${IMAGE_TAGS}"
         env:
           COSIGN_EXPERIMENTAL: 0
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
@@ -198,3 +198,8 @@ jobs:
           echo "::notice title=Verify provenance attestation cosign verify-attestation --key cosign.key ${IMAGE_NAME}@${IMAGE_DIGEST}"
           echo "::notice title=Download provenance attestation cosign download attestation --key cosign.key ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://slsa.dev/provenance/v0.2\")'"
 
+      - name: Show provenance file
+        id: vars
+        run: echo ::set-output name=provenancefile::$(cat provenance-predicate.att)
+      - name: Test output
+        run: echo ${{ steps.vars.outputs.provenancefile }}
