@@ -17,7 +17,7 @@ jobs:
       packages: write
 
     env:
-      IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
+      IMAGE_URL: ${{ steps.container_info.outputs.image-url }}
 
     outputs:
       image-url: ${{ steps.container_info.outputs.image-url }}
