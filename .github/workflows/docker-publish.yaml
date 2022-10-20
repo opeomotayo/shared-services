@@ -66,7 +66,11 @@ jobs:
           echo "::set-output name=container_digest::$CONTAINER_DIGEST"
           echo "::set-output name=container_tags::$(make container-tags CONTAINER_DIGEST="${CONTAINER_DIGEST}" | paste -s -d ',' -)"
           echo "::set-output name=container_repos::$(make container-repos CONTAINER_DIGEST="${CONTAINER_DIGEST}" | jq --raw-input . | jq --slurp -c)"
-
+      - name: Test container output
+        run: |
+          echo ${{ steps.container_info.outputs.container_digest }}
+          echo ${{ steps.container_info.outputs.container_tags }}
+          echo ${{ steps.container_info.outputs.container_repos }}
     
   # image_sign:
   #   runs-on: ubuntu-latest
