@@ -13,7 +13,7 @@ jobs:
 
     - name: Build docker
       run: |
-        docker build -t test .
+        docker build -t test ./dockerfile-selfhosted-runner
   build-2:
     name: Build Docker
     runs-on: my-custom-runner
@@ -23,7 +23,7 @@ jobs:
 
     - name: Build docker
       run: |
-        docker build -t test .
+        docker build -t test ./dockerfile-selfhosted-runner
   build-3:
     name: Build Docker
     runs-on: my-custom-runner
@@ -33,7 +33,7 @@ jobs:
 
     - name: Build docker
       run: |
-        docker build -t test .
+        docker build -t test ./dockerfile-selfhosted-runner
   build-4:
     name: Build Docker
     runs-on: my-custom-runner
@@ -43,7 +43,7 @@ jobs:
 
     - name: Build docker
       run: |
-        docker build -t test .
+        docker build -t test ./dockerfile-selfhosted-runner
   build-5:
     name: Build Docker
     runs-on: my-custom-runner
@@ -53,4 +53,4 @@ jobs:
 
     - name: Build docker
       run: |
-        docker build -t test .
+        docker build -t test ./dockerfile-selfhosted-runner
