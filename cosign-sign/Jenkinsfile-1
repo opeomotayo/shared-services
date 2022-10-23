@@ -8,6 +8,10 @@ pipeline {
     }
   }
 
+  options {
+      buildDiscarder(logRotator(numToKeepStr: '3'))
+   }
+
   environment {
     GITHUB_TOKEN=credentials('github')
     IMAGE_NAME='opeomotayo/jenkins-cosign-poc'
