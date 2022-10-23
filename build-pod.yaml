@@ -21,7 +21,7 @@ spec:
         - name: docker
           mountPath: /var/run/docker.sock # We use the k8s host docker engine
     - name: cosign
-      image: qihaixing/cosign
+      image: opeomotayo/cosign-docker-rootless
       #imagePullPolicy: Always
       command:
         - cat
