@@ -2,12 +2,12 @@ pipeline {
   
     agent {
     kubernetes {
-      label 'update-manifest'
-      defaultContainer 'jnlp'
+      label 'default docker build-pod'
+      defaultContainer 'docker'
       yamlFile 'build-pod.yaml'
     }
   }
-  
+
   environment {
     GITHUB_TOKEN=credentials('github')
     IMAGE_NAME='opeomotayo/jenkins-cosign-poc'
