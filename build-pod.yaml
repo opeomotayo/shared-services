@@ -20,6 +20,12 @@ spec:
       volumeMounts:
         - name: docker
           mountPath: /var/run/docker.sock # We use the k8s host docker engine
+    - name: cosign
+      image: bitnami/cosign
+      #imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
     - name: gcloud-sdk
       image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
       imagePullPolicy: Always
