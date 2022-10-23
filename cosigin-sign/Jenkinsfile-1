@@ -1,7 +1,7 @@
 pipeline {
   agent any
   environment {
-    GITHUB_TOKEN=credentials('github-token')
+    GITHUB_TOKEN=credentials('github')
     IMAGE_NAME='opeomotayo/jenkins-cosign-poc'
     IMAGE_VERSION='8.5-204'
   }
