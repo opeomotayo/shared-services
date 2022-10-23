@@ -1,7 +1,7 @@
 name: Dockerfile Vulnerability Scan
 
 on:
-  push: #workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,5 +13,5 @@ jobs:
       - name: Checkov Dockerfile Scan
         uses: bridgecrewio/checkov-action@v12.1347.0
         with:
-          directory: ./dockerfile-selfhosted-runner
+          directory: ./sample-dockerfile
           framework: dockerfile
