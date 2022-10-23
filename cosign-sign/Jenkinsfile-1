@@ -10,7 +10,7 @@ pipeline {
 
   environment {
     GITHUB_TOKEN=credentials('github')
-    IMAGE_NAME='opeomotayo/playground-dependency/jenkins-cosign-poc'
+    IMAGE_NAME='opeomotayo/jenkins-cosign-poc'
     IMAGE_VERSION='8.5-204'
   }
   stages {
