@@ -1,2 +1,4 @@
-FROM redhat/ubi8-minimal:8.5-204
-LABEL org.opencontainers.image.source https://github.com/opeomotayo/jenkins-cosign-poc
+FROM docker:rc-dind-rootless
+
+FROM gcr.io/projectsigstore/cosign:v0.3.1
+
