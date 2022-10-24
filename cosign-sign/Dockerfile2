@@ -1,0 +1,5 @@
+FROM docker:18.06.1-ce-dind
+
+RUN apk update && \
+    apk upgrade && \
+    apk add bash
