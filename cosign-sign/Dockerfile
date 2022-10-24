@@ -1,5 +1,7 @@
-FROM golang:1.15 as builder
-COPY . /usr/local
-WORKDIR /usr/local/
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /bin/app
-ENTRYPOINT ["/bin/app"]
+FROM alpine
+RUN apk add --update docker openrc
+RUN rc-update add docker boot
+  
+RUN wget "https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64"
+RUN  mv cosign-linux-amd64 /usr/local/bin/cosign
+RUN chmod +x /usr/local/bin/cosign
