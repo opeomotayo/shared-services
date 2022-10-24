@@ -1,4 +1,5 @@
-FROM gcr.io/projectsigstore/cosign:v0.3.1
+#FROM gcr.io/projectsigstore/cosign:v0.3.1
+FROM bitnami/cosign
 
 # docker repos
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
