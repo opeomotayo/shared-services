@@ -22,6 +22,7 @@ pipeline {
     stage('verify the container image') {
       steps {
         container('cosign'){
+          sh 'echo "$GITHUB_TOKEN_PSW" | docker login ghcr.io -u $GITHUB_TOKEN_USR --password-stdin'
           sh 'cosign version'
           sh 'cosign verify --key $COSIGN_PUBLIC_KEY ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'
         }
