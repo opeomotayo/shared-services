@@ -19,9 +19,9 @@ pipeline {
     COSIGN_PUBLIC_KEY=credentials('cosign-public-key')
   }
   stages {
-    stage('sign the container image') {
+    stage('verify the container image') {
       steps {
-        container('verify the container image'){
+        container('cosign'){
           sh 'cosign version'
           sh 'cosign verify --key $COSIGN_PUBLIC_KEY ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'
         }
