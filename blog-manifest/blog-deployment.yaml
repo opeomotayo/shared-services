@@ -15,5 +15,5 @@ spec:
         app: blog-app
     spec:
       containers:
-      - image: opeomotayo/blog-ci:4
+      - image: opeomotayo/blog-ci:5
         name: blog-app
