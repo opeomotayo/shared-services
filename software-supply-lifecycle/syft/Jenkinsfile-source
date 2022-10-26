@@ -14,10 +14,12 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        sh 'mvn -version'
-        sh 'pwd'
-        sh 'ls -la'
-        sh 'mvn clean package -Dcheckstyle.skip'
+        dir('software-supply-lifecycle/syft/Jenkinsfile-source'){
+          sh 'mvn -version'
+          sh 'pwd'
+          sh 'ls -la'
+          sh 'mvn clean package -Dcheckstyle.skip'
+        }
       }
     }
     stage('Generate SBOM') {
