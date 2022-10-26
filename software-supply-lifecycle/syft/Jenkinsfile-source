@@ -1,8 +1,8 @@
 pipeline {
   agent {
     kubernetes {
-      label 'default docker build-pod'
-      defaultContainer 'docker'
+      label 'default maven build-pod'
+      defaultContainer 'maven'
       yamlFile 'build-pod.yaml'
     }
   }
@@ -10,7 +10,7 @@ pipeline {
   options {
     buildDiscarder(logRotator(numToKeepStr: '3'))
   }
-  
+
   stages {
     stage('build') {
       steps {
