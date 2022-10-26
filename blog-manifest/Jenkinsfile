@@ -1,0 +1,43 @@
+pipeline {
+
+  environment {
+    IMAGE_TAG = "${env.BUILD_NUMBER}"
+  }
+
+  options {
+      buildDiscarder(logRotator(numToKeepStr: '3'))
+   }
+
+  agent {
+    kubernetes {
+      label 'update-manifest'
+      defaultContainer 'jnlp'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  stages {
+    stage('Update GIT') {
+      steps{
+        script {
+          dir("blog-manifest"){
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
+                sh "git config user.email opeomotayo@gmail.com"
+                sh "git config user.name opeomotayo"
+                //sh "git switch master"
+                sh "cat blog-deployment.yaml"
+                sh "sed -i 's+opeomotayo/blog-ci.*+opeomotayo/blog-ci:${DOCKERTAG}+g' blog-deployment.yaml"
+                sh "cat blog-deployment.yaml"
+                sh "git add ."
+                sh "git commit -m 'Done by Jenkins Job: changing manifest image tag to ${IMAGE_TAG}'"
+                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/playground-dependency.git HEAD:master"
+              }
+            }
+          }
+        }
+      }
+    } 
+  }
+}
