@@ -12,4 +12,4 @@ RUN chmod +x /usr/local/bin/cosign
 RUN apk add curl
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
-RUN apk add jq -y
+RUN apk add jq

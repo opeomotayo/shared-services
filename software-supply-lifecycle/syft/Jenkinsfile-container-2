@@ -1,0 +1,40 @@
+pipeline {
+  agent any
+  stages {
+    stage('Delete image if exists') {
+      steps {
+        sh '''
+          docker rmi java-docker:latest
+          rm -f java-docker-sbom.json
+        '''
+      }
+    }
+    stage('Create container image') {
+      steps {
+        sh 'docker build --tag java-docker:latest .'
+      }
+    }
+    stage('Generate SBOM') {
+      steps {
+        sh 'syft packages java-docker:latest --scope AllLayers -o json > ./java-docker-sbom.json'
+      }
+    }
+    stage('Does ant exist?') {
+      steps {
+        script {
+          def antFound = sh(returnStatus:true,script:'''
+              cat ./java-docker-sbom.json | jq -e '.artifacts[] | select(.name =="ant")'
+            ''')
+          if(antFound == 0) {
+            error(message:"ant was found in the SBOM. It should not be there.")
+          }
+        }
+      }
+    }
+    stage('Finally done') {
+      steps {
+        echo 'if I made it here, no ant was found'
+      }
+    }
+  }
+}
