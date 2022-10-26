@@ -1,5 +1,16 @@
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      label 'default docker build-pod'
+      defaultContainer 'docker'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+  
   stages {
     stage('build') {
       steps {
