@@ -34,11 +34,11 @@ spec:
         limits:
           cpu: 500m
           memory: 500Mi
-      - name: maven
-        image: maven:3.8.1-jdk-8
-        command:
-          - cat
-        tty: true
+    - name: maven
+      image: maven:3.8.1-jdk-8
+      command:
+        - cat
+      tty: true
     # - name: gcloud-sdk
     #   image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
     #   imagePullPolicy: Always
