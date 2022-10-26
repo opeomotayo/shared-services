@@ -14,7 +14,7 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        dir('software-supply-lifecycle'){
+        dir('software-supply-lifecycle/syft'){
           sh 'mvn -version'
           sh 'pwd'
           sh 'ls -la'
