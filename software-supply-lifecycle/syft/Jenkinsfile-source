@@ -24,7 +24,9 @@ pipeline {
     }
     stage('Generate SBOM') {
       steps {
-        sh 'syft packages dir:. --scope AllLayers'
+        container('cosign-syft'){
+          sh 'syft packages dir:. --scope AllLayers'
+        }
       }
     }
   }
