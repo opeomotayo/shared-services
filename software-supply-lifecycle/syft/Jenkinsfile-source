@@ -15,7 +15,7 @@ pipeline {
     stage('build') {
       steps {
         sh 'mvn -version'
-        sh './mvn clean package -Dcheckstyle.skip'
+        sh 'mvn clean package -Dcheckstyle.skip'
       }
     }
     stage('Generate SBOM') {
