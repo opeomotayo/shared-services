@@ -12,21 +12,27 @@ pipeline {
   }
 
   stages {
-    dir('software-supply-lifecycle/syft'){
-      stage('Delete image if exists') {
-        steps {
+    stage('Delete image if exists') {
+      steps {
+        dir('software-supply-lifecycle/syft'){
           sh 'docker rmi java-docker:latest'
         }
       }
-      stage('Create container image') {
-        steps {
+    }
+    stage('Create container image') {
+      steps {
+        dir('software-supply-lifecycle/syft'){
           sh 'docker build --tag java-docker:latest .'
+          sh 'docker image ls'
         }
       }
-      stage('Generate SBOM') {
-        steps {
+    }
+    stage('Generate SBOM') {
+      steps {
+        dir('software-supply-lifecycle/syft'){
           container('cosign-syft'){
             sh 'syft packages java-docker:latest --scope AllLayers'
+            sh 'ls -last'
           }
         }
       }
