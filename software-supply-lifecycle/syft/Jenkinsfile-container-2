@@ -50,7 +50,7 @@ pipeline {
           container('cosign-syft'){
             sh '''
               echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin
-              syft packages java-docker:latest --scope AllLayers -o json > ./java-docker-sbom.json
+              syft packages opeomotayo/java-docker:latest --scope AllLayers -o json > ./java-docker-sbom.json
             '''  
           }
         }
