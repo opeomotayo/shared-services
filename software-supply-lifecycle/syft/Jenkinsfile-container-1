@@ -35,6 +35,7 @@ pipeline {
       steps {
         dir('software-supply-lifecycle/syft'){
           container('cosign-syft'){
+            sh 'echo "$GITHUB_TOKEN_PSW" | docker login ghcr.io -u $GITHUB_TOKEN_USR --password-stdin'
             sh 'syft packages java-docker:latest --scope AllLayers'
             sh 'ls -last'
           }
