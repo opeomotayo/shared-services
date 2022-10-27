@@ -8,7 +8,7 @@ pipeline {
   }
 
   environment {
-    GITHUB_TOKEN=credentials('github')
+    DOCKER_HUB=credentials('dockerhub')
   }
 
   options {
@@ -33,7 +33,7 @@ pipeline {
     }
     stage('push image') {
       steps {
-        sh 'echo "$GITHUB_TOKEN_PSW" | docker login ghcr.io -u $GITHUB_TOKEN_USR --password-stdin'
+        sh 'echo "$DOCKER_HUB_PSW" | docker login ghcr.io -u $DOCKER_HUB_USR --password-stdin'
         sh 'docker push opeomotayo/java-docker:latest'
       }
     }
@@ -41,7 +41,7 @@ pipeline {
       steps {
         dir('software-supply-lifecycle/syft'){
           container('cosign-syft'){
-            sh 'echo "$GITHUB_TOKEN_PSW" | docker login ghcr.io -u $GITHUB_TOKEN_USR --password-stdin'
+            sh 'echo "$DOCKER_HUB_PSW" | docker login ghcr.io -u $DOCKER_HUB_USR --password-stdin'
             sh 'syft packages opeomotayo/java-docker:latest --scope AllLayers'
             sh 'ls -last'
           }
