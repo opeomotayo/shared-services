@@ -16,7 +16,7 @@ pipeline {
       steps {
         dir('software-supply-lifecycle/syft'){
           sh 'docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)'
-          sh 'docker rmi $(docker images -qa -f 'dangling=true')'
+          sh "docker rmi $(docker images -qa -f 'dangling=true')"
         }
       }
     }
