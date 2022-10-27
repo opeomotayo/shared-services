@@ -1,32 +1,73 @@
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      label 'default maven build-pod'
+      defaultContainer 'docker'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  environment {
+    DOCKER_HUB=credentials('dockerhub')
+  }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+
   stages {
     stage('Delete image if exists') {
       steps {
-        sh '''
-          docker rmi java-docker:latest
-          rm -f java-docker-sbom.json
-        '''
+        dir('software-supply-lifecycle/syft'){
+          sh '''
+            docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)
+            rm -f java-docker-sbom.json
+          '''
+        }
       }
     }
     stage('Create container image') {
       steps {
-        sh 'docker build --tag java-docker:latest .'
+        dir('software-supply-lifecycle/syft'){
+          sh '''
+            docker build --tag opeomotayo/java-docker:latest .
+            docker image ls
+          '''
+        }
+      }
+    }
+    stage('push image') {
+      steps {
+        sh '''
+          echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin
+          docker push opeomotayo/java-docker:latest
+        '''
       }
     }
     stage('Generate SBOM') {
       steps {
-        sh 'syft packages java-docker:latest --scope AllLayers -o json > ./java-docker-sbom.json'
+        dir('software-supply-lifecycle/syft'){
+          container('cosign-syft'){
+            sh '''
+              echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin
+              syft packages java-docker:latest --scope AllLayers -o json > ./java-docker-sbom.json
+            '''  
+          }
+        }
       }
     }
     stage('Does ant exist?') {
       steps {
-        script {
-          def antFound = sh(returnStatus:true,script:'''
-              cat ./java-docker-sbom.json | jq -e '.artifacts[] | select(.name =="ant")'
-            ''')
-          if(antFound == 0) {
-            error(message:"ant was found in the SBOM. It should not be there.")
+        dir('software-supply-lifecycle/syft'){
+          container('cosign-syft'){
+            script {
+              def antFound = sh(returnStatus:true,script:'''
+                  cat ./java-docker-sbom.json | jq -e '.artifacts[] | select(.name =="ant")'
+                ''')
+              if(antFound == 0) {
+                error(message:"ant was found in the SBOM. It should not be there.")
+              }
+            }
           }
         }
       }
