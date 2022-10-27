@@ -1,19 +1,34 @@
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      label 'default maven build-pod'
+      defaultContainer 'docker'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+
   stages {
-    stage('Delete image if exists') {
-      steps {
-        sh 'docker rmi java-docker:latest'
+    dir('software-supply-lifecycle/syft'){
+      stage('Delete image if exists') {
+        steps {
+          sh 'docker rmi java-docker:latest'
+        }
       }
-    }
-    stage('Create container image') {
-      steps {
-        sh 'docker build --tag java-docker:latest .'
+      stage('Create container image') {
+        steps {
+          sh 'docker build --tag java-docker:latest .'
+        }
       }
-    }
-    stage('Generate SBOM') {
-      steps {
-        sh 'syft packages java-docker:latest --scope AllLayers'
+      stage('Generate SBOM') {
+        steps {
+          container('cosign-syft'){
+            sh 'syft packages java-docker:latest --scope AllLayers'
+          }
+        }
       }
     }
   }

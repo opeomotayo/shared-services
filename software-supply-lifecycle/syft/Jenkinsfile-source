@@ -15,17 +15,16 @@ pipeline {
     stage('build') {
       steps {
         dir('software-supply-lifecycle/syft'){
-          sh 'mvn -version'
-          sh 'pwd'
-          sh 'ls -la'
           sh 'mvn clean package -Dcheckstyle.skip'
         }
       }
     }
     stage('Generate SBOM') {
       steps {
-        container('cosign-syft'){
-          sh 'syft packages dir:. --scope AllLayers'
+        dir('software-supply-lifecycle/syft'){
+          container('cosign-syft'){
+            sh 'syft packages dir:. --scope AllLayers'
+          }
         }
       }
     }
