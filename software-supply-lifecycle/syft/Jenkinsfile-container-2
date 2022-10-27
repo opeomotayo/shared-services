@@ -57,16 +57,16 @@ pipeline {
         }
       }
     }
-    stage('Does ant exist?') {
+    stage('Does WireFrame exist?') {
       steps {
         dir('software-supply-lifecycle/syft'){
           container('cosign-syft'){
             script {
-              def antFound = sh(returnStatus:true,script:'''
-                  cat ./java-docker-sbom.json | jq -e '.artifacts[] | select(.name =="ant")'
+              def WireFrameFound = sh(returnStatus:true,script:'''
+                  cat ./java-docker-sbom.json | jq -e '.artifacts[] | select(.name =="WireFrame")'
                 ''')
-              if(antFound == 0) {
-                error(message:"ant was found in the SBOM. It should not be there.")
+              if(WireFrameFound == 0) {
+                error(message:"WireFrame was found in the SBOM. It should not be there.")
               }
             }
           }
@@ -75,7 +75,7 @@ pipeline {
     }
     stage('Finally done') {
       steps {
-        echo 'if I made it here, no ant was found'
+        echo 'if I made it here, no WireFrame was found'
       }
     }
   }
