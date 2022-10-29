@@ -14,16 +14,16 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        dir('software-supply-lifecycle/syft-generate-sbom'){
+        dir('software-supply-lifecycle/grype-scan-image'){
           sh 'mvn clean package -Dcheckstyle.skip'
         }
       }
     }
     stage('Generate SBOM') {
       steps {
-        dir('software-supply-lifecycle/syft-generate-sbom'){
+        dir('software-supply-lifecycle/grype-scan-image'){
           container('security-tools'){
-            sh 'syft packages dir:. --scope AllLayers'
+            sh 'grype dir:. --scope AllLayers'
           }
         }
       }
