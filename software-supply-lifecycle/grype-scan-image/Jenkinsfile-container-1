@@ -42,7 +42,7 @@ pipeline {
         dir('software-supply-lifecycle/grype-scan-image'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'grype java-docker:latest --scope AllLayers'
+            sh 'grype opeomotayo/java-docker:latest --scope AllLayers'
           }
         }
       }
