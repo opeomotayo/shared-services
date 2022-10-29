@@ -1,19 +1,50 @@
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      label 'default maven build-pod'
+      defaultContainer 'docker'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  environment {
+    DOCKER_HUB=credentials('dockerhub')
+  }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+
   stages {
     stage('Delete image if exists') {
       steps {
-        sh 'docker rmi java-docker:latest'
+        dir('software-supply-lifecycle/grype-scan-image'){
+          sh 'docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)'
+        }
       }
     }
     stage('Create container image') {
       steps {
-        sh 'docker build --tag java-docker:latest .'
+        dir('software-supply-lifecycle/grype-scan-image'){
+          sh 'docker build --tag opeomotayo/java-docker:latest .'
+          sh 'docker image ls'
+        }
+      }
+    }
+    stage('Publish container image') {
+      steps {
+        sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        sh 'docker push opeomotayo/java-docker:latest'
       }
     }
     stage('Run Vulnerability Scan') {
       steps {
-        sh 'grype java-docker:latest --scope AllLayers'
+        dir('software-supply-lifecycle/grype-scan-image'){
+          container('security-tools'){
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'grype java-docker:latest --scope AllLayers'
+          }
+        }
       }
     }
   }
