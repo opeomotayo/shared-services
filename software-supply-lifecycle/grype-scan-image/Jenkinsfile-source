@@ -1,14 +1,31 @@
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      label 'default maven build-pod'
+      defaultContainer 'maven'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+
   stages {
     stage('build') {
       steps {
-        sh './mvnw clean package -Dcheckstyle.skip'
+        dir('software-supply-lifecycle/syft-generate-sbom'){
+          sh 'mvn clean package -Dcheckstyle.skip'
+        }
       }
     }
-    stage('Scan') {
+    stage('Generate SBOM') {
       steps {
-        sh 'grype dir:. --scope AllLayers'
+        dir('software-supply-lifecycle/syft-generate-sbom'){
+          container('security-tools'){
+            sh 'syft packages dir:. --scope AllLayers'
+          }
+        }
       }
     }
   }

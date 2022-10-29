@@ -14,15 +14,15 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        dir('software-supply-lifecycle/syft'){
+        dir('software-supply-lifecycle/syft-generate-sbom'){
           sh 'mvn clean package -Dcheckstyle.skip'
         }
       }
     }
     stage('Generate SBOM') {
       steps {
-        dir('software-supply-lifecycle/syft'){
-          container('cosign-syft'){
+        dir('software-supply-lifecycle/syft-generate-sbom'){
+          container('security-tools'){
             sh 'syft packages dir:. --scope AllLayers'
           }
         }

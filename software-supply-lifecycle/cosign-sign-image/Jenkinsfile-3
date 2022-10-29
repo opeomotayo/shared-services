@@ -14,14 +14,14 @@ pipeline {
 
   environment {
     GITHUB_TOKEN=credentials('github')
-    IMAGE_NAME='opeomotayo/jenkins-cosign-poc'
+    IMAGE_NAME='opeomotayo/cosign-sign-image'
     IMAGE_VERSION='8.5-204'
     COSIGN_PUBLIC_KEY=credentials('cosign-public-key')
   }
   stages {
     stage('verify the container image') {
       steps {
-        container('cosign-syft'){
+        container('security-tools'){
           sh 'echo "$GITHUB_TOKEN_PSW" | docker login ghcr.io -u $GITHUB_TOKEN_USR --password-stdin'
           sh 'cosign version'
           sh 'cosign verify --key $COSIGN_PUBLIC_KEY ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'

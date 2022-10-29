@@ -14,7 +14,7 @@ pipeline {
 
   environment {
     GITHUB_TOKEN=credentials('github')
-    IMAGE_NAME='opeomotayo/jenkins-cosign-poc'
+    IMAGE_NAME='opeomotayo/cosign-sign-image'
     IMAGE_VERSION='8.5-204'
   }
   stages {
@@ -25,7 +25,7 @@ pipeline {
     }
     stage('build image') {
       steps {
-        sh 'docker build -t $IMAGE_NAME:$IMAGE_VERSION ./cosign-sign'
+        sh 'docker build -t $IMAGE_NAME:$IMAGE_VERSION ./cosign-sign-image'
       }
     }
     stage('login to GHCR') {
