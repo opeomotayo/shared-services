@@ -31,7 +31,6 @@ jobs:
           go-version-file: go.mod
           check-latest: true
           cache: true
-        working-directory: ./software-supply-lifecycle/slsa-provenance-action
 
       # - name: Get dependencies
       #   run: make download
