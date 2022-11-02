@@ -9,9 +9,9 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-20.04
-    # defaults:
-    #   run:
-    #     working-directory: ./software-supply-lifecycle/slsa-provenance-action
+    defaults:
+      run:
+        working-directory: software-supply-lifecycle/slsa-provenance-action
 
     permissions:
       contents: write # tests create releases
@@ -23,7 +23,6 @@ jobs:
 
       - name: list files
         run: |
-          cd software-supply-lifecycle/slsa-provenance-action
           ls -la
 
       - name: Set up Go
