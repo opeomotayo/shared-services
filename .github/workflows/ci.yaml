@@ -1,8 +1,8 @@
 on:
   push:
-  workflow_dispatch:
-  paths:
-    - software-supply-lifecycle/slsa-provenance-action
+
+    paths:
+      - software-supply-lifecycle/slsa-provenance-action
 
 jobs:
   build:
