@@ -1,14 +1,16 @@
 on:
   push:
   workflow_dispatch:
+  paths:
+    - software-supply-lifecycle/slsa-provenance-action
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-20.04
-    defaults:
-      run:
-        working-directory: ./software-supply-lifecycle/slsa-provenance-action
+    # defaults:
+    #   run:
+    #     working-directory: ./software-supply-lifecycle/slsa-provenance-action
 
     permissions:
       contents: write # tests create releases
@@ -22,7 +24,6 @@ jobs:
         run: pwd
 
       - name: Set up Go
-        run : cd ./software-supply-lifecycle/slsa-provenance-action
         uses: actions/setup-go@v3.3.1
         with:
           go-version-file: go.mod
