@@ -22,5 +22,5 @@ jobs:
           check-latest: true
           cache: true
 
-      # - name: Get dependencies
-      #   run: make download
+      - name: Get dependencies
+        run: make download
