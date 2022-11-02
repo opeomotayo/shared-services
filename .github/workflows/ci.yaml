@@ -15,12 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3.1.0
 
-      # - name: Set up Go
-      #   uses: actions/setup-go@v3.3.1
-      #   with:
-      #     go-version-file: go.mod
-      #     check-latest: true
-      #     cache: true
+      - name: Set up Go
+        uses: actions/setup-go@v3.3.1
+        with:
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
 
       # - name: Get dependencies
       #   run: make download
