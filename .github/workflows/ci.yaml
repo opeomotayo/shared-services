@@ -1,6 +1,7 @@
 on:
   push:
-
+    branches:
+    - master
     paths:
       - software-supply-lifecycle/slsa-provenance-action
 
