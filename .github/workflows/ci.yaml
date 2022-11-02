@@ -19,7 +19,7 @@ jobs:
         run: ls -la
 
       - name: Set up Go
-      working-directory: ./software-supply-lifecycle/slsa-provenance-actio
+       working-directory: ./software-supply-lifecycle/slsa-provenance-actio
         uses: actions/setup-go@v3.3.1
         with:
           go-version-file: go.mod
