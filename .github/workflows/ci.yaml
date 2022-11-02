@@ -23,8 +23,8 @@ jobs:
 
       - name: list files
         run: |
-        cd software-supply-lifecycle/slsa-provenance-action
-        ls -la
+          cd software-supply-lifecycle/slsa-provenance-action
+          ls -la
 
       - name: Set up Go
         uses: actions/setup-go@v3.3.1
