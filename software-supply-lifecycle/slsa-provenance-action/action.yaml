@@ -1,0 +1,63 @@
+name: 'SLSA Build Provenance Action'
+description: 'An action to generate SLSA build provenance for an artifact'
+branding:
+  icon: lock
+  color: purple
+inputs:
+  command:
+    description: 'The command to use (available options: generate)'
+    required: false
+    default: 'generate'
+  subcommand:
+    description: 'The subcommand to use when generating provenance'
+    required: false
+    default: 'files'
+  github_context:
+    description: 'internal (do not set): the "github" context object in json'
+    required: true
+    default: ${{ toJSON(github) }}
+  runner_context:
+    description: 'internal (do not set): the "runner" context object in json'
+    required: true
+    default: ${{ toJSON(runner) }}
+  arguments:
+    description: 'commandline options for the given subcommand'
+    required: true
+  install-dir:
+    description: 'Where to install the slsa-provenance binary'
+    required: false
+    default: '$HOME/.slsa-provenance'
+runs:
+  using: 'composite'
+  steps:
+    - name: install binary
+      shell: bash
+      run: $GITHUB_ACTION_PATH/install-slsa-provenance.sh
+      env:
+        INSTALL_PATH: ${{ inputs.install-dir }}
+
+    - name: compose arguments
+      id: compose-args
+      shell: bash
+      run: |
+        encoded_github="$(echo ${GITHUB_CONTEXT} | base64 -w 0)"
+        encoded_runner="$(echo ${RUNNER_CONTEXT} | base64 -w 0)"
+
+        args=(${{ inputs.command }})
+        args+=(${{ inputs.subcommand }})
+        args+=(--github-context)
+        args+=("${encoded_github}")
+        args+=(--runner-context)
+        args+=("${encoded_runner}")
+        args+=(${{ inputs.arguments }})
+
+        echo "provenance_args=${args[@]}" >> $GITHUB_OUTPUT
+      env:
+        GITHUB_CONTEXT: ${{ inputs.github_context }}
+        RUNNER_CONTEXT: ${{ inputs.runner_context }}
+
+    - name: Generate provenance
+      shell: bash
+      run: $INSTALL_PATH/slsa-provenance ${{ steps.compose-args.outputs.provenance_args }}
+      env:
+        INSTALL_PATH: ${{ inputs.install-dir }}
