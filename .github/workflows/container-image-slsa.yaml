@@ -36,22 +36,78 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4.1.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@v3.2.0
         with:
           context: ./container-image-security/app-image
           push: true
-          # tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
+
+      # - name: Get container info
+      #   id: container_info
+      #   run: |
+      #     # echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}"
+      #     # docker inspect --format='{{index .RepoDigests 0}}' $IMAGE
+      #     image_digest="$(docker inspect "${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+      #     echo "::set-output name=image-digest::${image_digest}"
+      #     echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
+      #     echo "::set-output name=image-name::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
+      #     echo "::set-output name=image-tags::${{ github.run_id }}"
+
+      # - name: Test container output
+      #   run: |
+      #     echo ${{ steps.container_info.outputs.image-url }}
+      #     echo ${{ steps.container_info.outputs.image-name }}
+      #     echo ${{ steps.container_info.outputs.image-tags }}
+      #     echo ${{ steps.container_info.outputs.image-digest }}
+    
+  image_sign:
+    runs-on: ubuntu-latest
+    needs: [image_build]
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      # IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
+      IMAGE_NAME: ${{ needs.image_build.outputs.image-name }} #ghcr.io/opeomotayo/signedcontainer
+      # IMAGE_TAGS: ${{ needs.image_build.outputs.image-tags }}
+      IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }} #sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
+    
+    steps:
+      - name: Log into registry
+        uses: docker/login-action@v1.14.1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: cosign-installer
+        uses: sigstore/cosign-installer@v2.0.0
+        
+      - name: Write signing key to disk
+        run: 'echo "$KEY" > cosign.key'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      
+      - name: Sign the published Docker image
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          cosign sign --key cosign.key cosign.key ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} #${IMAGE_NAME}@${IMAGE_DIGEST}
+
+      # - name: Write signing key to disk
+      #   run: 'echo "$KEY" > cosign.pubkey'
+      #   shell: bash
+      #   env:
+      #     KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
+      
+      # - name: Verify the published Docker image
+      #   env:
+      #     COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+      #   run: | 
+      #     echo "::notice title=Verify signature cosign verify --key cosign.pubkey ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0]'"
+      #     echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
+      #     echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${IMAGE_NAME}@${IMAGE_DIGEST} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
