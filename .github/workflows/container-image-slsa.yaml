@@ -96,7 +96,7 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key cosign.key cosign.key ${{ env.IMAGE_FULL_URL }}
+          cosign sign --key cosign.key -a "author=OpeOmotayo" ${{ env.IMAGE_FULL_URL }}
           
       # - name: Write signing key to disk
       #   run: 'echo "$KEY" > cosign.pubkey'
