@@ -27,10 +27,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@v1.6.0
+        uses: docker/setup-buildx-action@v2
 
       - name: Log into registry
-        uses: docker/login-action@v1.14.1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -38,7 +38,7 @@ jobs:
 
       - name: Build and push Docker image
         id: build-and-push
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v3
         with:
           context: ./container-image-security/app-image
           push: true
@@ -77,14 +77,16 @@ jobs:
     
     steps:
       - name: Log into registry
-        uses: docker/login-action@v1.14.1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: cosign-installer
-        uses: sigstore/cosign-installer@v2.0.0
+        uses: sigstore/cosign-installer@main
+        with:
+          cosign-release: 'v1.13.1'
         
       - name: Write signing key to disk
         run: 'echo "$KEY" > cosign.key'
@@ -98,16 +100,16 @@ jobs:
         run: |
           cosign sign --key cosign.key -a "author=OpeOmotayo" ${{ env.IMAGE_FULL_URL }}
           
-      # - name: Write signing key to disk
-      #   run: 'echo "$KEY" > cosign.pubkey'
-      #   shell: bash
-      #   env:
-      #     KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
+      - name: Write signing key to disk
+        run: 'echo "$KEY" > cosign.pubkey'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
       
-      # - name: Verify the published Docker image
-      #   env:
-      #     COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-      #   run: | 
-      #     echo "::notice title=Verify signature cosign verify --key cosign.pubkey ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0]'"
-      #     echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${IMAGE_NAME}@${IMAGE_DIGEST} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
-      #     echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${IMAGE_NAME}@${IMAGE_DIGEST} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
+      - name: Verify the published Docker image
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: | 
+          echo "::notice title=Verify signature cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }}| jq '.[0]'"
+          echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
+          echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
