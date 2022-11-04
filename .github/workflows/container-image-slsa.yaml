@@ -98,7 +98,6 @@ jobs:
         run: |
           cosign sign --key cosign.key cosign.key ${{ env.IMAGE_FULL_URL }}
           
-
       # - name: Write signing key to disk
       #   run: 'echo "$KEY" > cosign.pubkey'
       #   shell: bash
