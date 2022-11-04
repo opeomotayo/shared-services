@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/acme-challenge-type: dns01
+    cert-manager.io/acme-dns01-provider: prod-route53
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+  labels:
+    app: getting-started
+    service: getting-started
+  name: getting-started
+  namespace: s3c-demo
+spec:
+  rules:
+  - host: s3c-demo.kubernetes.mattiasgees.be
+    http:
+      paths:
+      - backend:
+          service:
+            name: getting-started
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - s3c-demo.kubernetes.mattiasgees.be
+    secretName: getting-started-cert

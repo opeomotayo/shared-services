@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: getting-started
+  name: getting-started
+  namespace: s3c-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: getting-started
+  template:
+    metadata:
+      labels:
+        app: getting-started
+    spec:
+      containers:
+      - image: mattiasgees/s3c-demo:main
+        imagePullPolicy: IfNotPresent
+        name: getting-started
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      restartPolicy: Always
