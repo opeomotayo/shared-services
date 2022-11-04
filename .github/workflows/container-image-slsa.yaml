@@ -54,19 +54,15 @@ jobs:
           echo "::set-output name=image-full-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
           echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
           echo "::set-output name=image-tags::${{ github.run_id }}"
-          # echo "image-digest=${image_digest} >> $GITHUB_OUTPUT"
-          # echo "image-full-url=${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} >> $GITHUB_OUTPUT"
-          # echo "image-url=${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }} >> $GITHUB_OUTPUT"
-          # echo "image-tags=${{ github.run_id }} >> $GITHUB_OUTPUT"
 
-      - name: Test container output
+      - name: Diplay container output
         run: |
           echo ${{ steps.container_info.outputs.image-full-url }}
           echo ${{ steps.container_info.outputs.image-url }}
           echo ${{ steps.container_info.outputs.image-tags }}
           echo ${{ steps.container_info.outputs.image-digest }}
     
-  image_sign_verify:
+  image_sign_and_verify:
     runs-on: ubuntu-latest
     needs: [image_build]
     permissions:
@@ -89,8 +85,6 @@ jobs:
 
       - name: cosign-installer
         uses: sigstore/cosign-installer@main
-        with:
-          cosign-release: 'v1.13.1'
         
       - name: Write signing key to disk
         run: 'echo "$KEY" > cosign.key'
@@ -117,3 +111,48 @@ jobs:
           echo "::notice title=Verify signature cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }}| jq '.[0]'"
           echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
           echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
+
+  image_sbom:
+    runs-on: ubuntu-latest
+    needs: [image_build]
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      IMAGE_FULL_URL: ${{ needs.image_build.outputs.image-full-url }} #ghcr.io/opeomotayo/shared-services:339232682
+      # IMAGE_URL: ${{ needs.image_build.outputs.image-url }} #ghcr.io/opeomotayo/shared-services
+      # IMAGE_TAGS: ${{ needs.image_build.outputs.image-tags }}
+      IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }} #sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
+
+    steps:
+      - name: cosign-installer
+        uses: sigstore/cosign-installer@main
+      - name: Install Syft
+        uses: anchore/sbom-action@v0
+      - name: Login to ghcr.io
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Write signing key to disk
+        run: 'echo "$KEY" > cosign.key'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+
+            - name: Attach SBOM to image
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          syft "${{ env.IMAGE_FULL_URL }}" -o spdx-json=sbom-spdx.json
+          cosign attest --key cosign.key --predicate sbom-spdx.json --type spdx ${{ env.IMAGE_FULL_URL }}"
+          echo "::notice title=Verify SBOM attestation cosign verify-attestation --key cosign.key ${{ env.IMAGE_FULL_URL }}"
+          echo "::notice title=Download SBOM attestation cosign download attestation --key cosign.key ${{ env.IMAGE_FULL_URL }}" | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://spdx.dev/Document\") | .predicate.Data | fromjson'"
+      - name:  write SBOM file
+        id: vars
+        run: echo ::set-output name=sbomfile::$(cat sbom-spdx.json)
+      - name: Display SBOM Output
+        run: echo ${{ steps.vars.outputs.sbomfile }}
