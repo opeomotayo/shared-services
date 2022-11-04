@@ -54,7 +54,6 @@ jobs:
           # echo "::set-output name=image-full-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
           # echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
           # echo "::set-output name=image-tags::${{ github.run_id }}"
-
           echo "image-digest=${image_digest} >> $GITHUB_OUTPUT"
           echo "image-full-url=${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} >> $GITHUB_OUTPUT"
           echo "image-url=${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }} >> $GITHUB_OUTPUT"
