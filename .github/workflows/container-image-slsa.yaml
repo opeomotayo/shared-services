@@ -50,10 +50,15 @@ jobs:
           # echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}"
           # docker inspect --format='{{index .RepoDigests 0}}' $IMAGE
           image_digest="$(docker inspect "${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
-          echo "::set-output name=image-digest::${image_digest}"
-          echo "::set-output name=image-full-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-          echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
-          echo "::set-output name=image-tags::${{ github.run_id }}"
+          # echo "::set-output name=image-digest::${image_digest}"
+          # echo "::set-output name=image-full-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
+          # echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
+          # echo "::set-output name=image-tags::${{ github.run_id }}"
+
+          echo "image-digest=${image_digest} >> $GITHUB_OUTPUT"
+          echo "image-full-url=${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} >> $GITHUB_OUTPUT"
+          echo "image-url=${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }} >> $GITHUB_OUTPUT"
+          echo "image-tags=${{ github.run_id }} >> $GITHUB_OUTPUT"
 
       - name: Test container output
         run: |
