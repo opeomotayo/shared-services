@@ -40,6 +40,6 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v3.2.0
         with:
-          context: ./slsa
+          context: ./container-image-security/app-image
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
