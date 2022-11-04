@@ -17,8 +17,8 @@ jobs:
       packages: write
 
     outputs:
+      image-full-url: ${{ steps.container_info.outputs.image-full-url }}
       image-url: ${{ steps.container_info.outputs.image-url }}
-      image-name: ${{ steps.container_info.outputs.image-name }}
       image-digest: ${{ steps.container_info.outputs.image-digest }}
       image-tags: ${{ steps.container_info.outputs.image-tags }}
 
@@ -51,14 +51,14 @@ jobs:
           # docker inspect --format='{{index .RepoDigests 0}}' $IMAGE
           image_digest="$(docker inspect "${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
           echo "::set-output name=image-digest::${image_digest}"
-          echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-          echo "::set-output name=image-name::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
+          echo "::set-output name=image-full-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
+          echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
           echo "::set-output name=image-tags::${{ github.run_id }}"
 
       - name: Test container output
         run: |
+          echo ${{ steps.container_info.outputs.image-full-url }}
           echo ${{ steps.container_info.outputs.image-url }}
-          echo ${{ steps.container_info.outputs.image-name }}
           echo ${{ steps.container_info.outputs.image-tags }}
           echo ${{ steps.container_info.outputs.image-digest }}
     
@@ -70,8 +70,8 @@ jobs:
       packages: write
 
     env:
-      # IMAGE_URL: ${{ needs.image_build.outputs.image-url }}
-      IMAGE_NAME: ${{ needs.image_build.outputs.image-name }} #ghcr.io/opeomotayo/signedcontainer
+      IMAGE_FULL_URL: ${{ needs.image_build.outputs.image-full-url }} #ghcr.io/opeomotayo/shared-services:339232682
+      # IMAGE_URL: ${{ needs.image_build.outputs.image-url }} #ghcr.io/opeomotayo/shared-services
       # IMAGE_TAGS: ${{ needs.image_build.outputs.image-tags }}
       IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }} #sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
     
@@ -96,7 +96,7 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key cosign.key cosign.key ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} #${IMAGE_NAME}@${IMAGE_DIGEST}
+          cosign sign --key cosign.key cosign.key ${{ env.IMAGE_FULL_URL }}
           
 
       # - name: Write signing key to disk
