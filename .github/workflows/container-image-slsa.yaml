@@ -16,11 +16,11 @@ jobs:
       contents: read
       packages: write
 
-    # outputs:
-    #   image-url: ${{ steps.container_info.outputs.image-url }}
-    #   image-name: ${{ steps.container_info.outputs.image-name }}
-    #   image-digest: ${{ steps.container_info.outputs.image-digest }}
-    #   image-tags: ${{ steps.container_info.outputs.image-tags }}
+    outputs:
+      image-url: ${{ steps.container_info.outputs.image-url }}
+      image-name: ${{ steps.container_info.outputs.image-name }}
+      image-digest: ${{ steps.container_info.outputs.image-digest }}
+      image-tags: ${{ steps.container_info.outputs.image-tags }}
 
     steps:
       - name: Checkout repository
@@ -44,23 +44,23 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
 
-      # - name: Get container info
-      #   id: container_info
-      #   run: |
-      #     # echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}"
-      #     # docker inspect --format='{{index .RepoDigests 0}}' $IMAGE
-      #     image_digest="$(docker inspect "${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
-      #     echo "::set-output name=image-digest::${image_digest}"
-      #     echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-      #     echo "::set-output name=image-name::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
-      #     echo "::set-output name=image-tags::${{ github.run_id }}"
+      - name: Get container info
+        id: container_info
+        run: |
+          # echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}"
+          # docker inspect --format='{{index .RepoDigests 0}}' $IMAGE
+          image_digest="$(docker inspect "${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+          echo "::set-output name=image-digest::${image_digest}"
+          echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
+          echo "::set-output name=image-name::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
+          echo "::set-output name=image-tags::${{ github.run_id }}"
 
-      # - name: Test container output
-      #   run: |
-      #     echo ${{ steps.container_info.outputs.image-url }}
-      #     echo ${{ steps.container_info.outputs.image-name }}
-      #     echo ${{ steps.container_info.outputs.image-tags }}
-      #     echo ${{ steps.container_info.outputs.image-digest }}
+      - name: Test container output
+        run: |
+          echo ${{ steps.container_info.outputs.image-url }}
+          echo ${{ steps.container_info.outputs.image-name }}
+          echo ${{ steps.container_info.outputs.image-tags }}
+          echo ${{ steps.container_info.outputs.image-digest }}
     
   image_sign_verify:
     runs-on: ubuntu-latest
@@ -96,7 +96,7 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          cosign sign --key cosign.key cosign.key ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} 
+          cosign sign --key cosign.key cosign.key ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }} #${IMAGE_NAME}@${IMAGE_DIGEST}
           
 
       # - name: Write signing key to disk
