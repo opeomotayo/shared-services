@@ -112,7 +112,7 @@ jobs:
           echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
           echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
 
-  image_sbom:
+  sbom_generate_attest_verify_attestation:
     runs-on: ubuntu-latest
     needs: [image_build]
 
@@ -142,8 +142,7 @@ jobs:
         shell: bash
         env:
           KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-
-            - name: Attach SBOM to image
+      - name: Attach SBOM to image
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
