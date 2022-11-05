@@ -140,7 +140,6 @@ jobs:
           password: ${{ secrets.DOCKER_HUB }}
 
       - name: Install Provenance and Publish SBOM with Image
-        id: provenance    
         if: ${{ github.event_name != 'pull_request' }}
         uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
         with:
