@@ -99,8 +99,7 @@ jobs:
         shell: bash
         env:
           KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-        run: |
-          run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ needs.image_build_and_publish.outputs.digest }}
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ needs.image_build_and_publish.outputs.digest }}
 
       # - name: Sign the SBOM
       #   if: ${{ github.event_name != 'pull_request' }}
