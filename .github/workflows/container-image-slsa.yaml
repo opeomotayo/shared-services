@@ -2,12 +2,16 @@ name: Container Image SLSA
 
 on:
   push:
-    branches: [ master ]
+    branches: [ "master" ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ "master" ]
   workflow_dispatch:
     
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: shared-services
+  REGISTRY: docker.io
+  IMAGE_NAME: opeomotayo/shared-services
 
 jobs:
   image_build:
@@ -16,15 +20,9 @@ jobs:
       contents: read
       packages: write
 
-    # outputs:
-    #   image-full-url: ${{ steps.container_info.outputs.image-full-url }}
-    #   image-url: ${{ steps.container_info.outputs.image-url }}
-    #   image-digest: ${{ steps.container_info.outputs.image-digest }}
-    #   image-tags: ${{ steps.container_info.outputs.image-tags }}
     outputs:
       image: ${{ steps.image.outputs.image }}
       digest: ${{ steps.build-and-push.outputs.digest }}
-
 
     steps:
       - name: Checkout repository
@@ -39,7 +37,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.DOCKER_HUB }} #${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.DOCKER_HUB }}
 
       # # Extract metadata (tags, labels) for Docker
       # - name: Extract Docker metadata
