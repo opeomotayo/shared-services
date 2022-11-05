@@ -89,19 +89,18 @@ jobs:
           artifact-name: sbom-spdx.json
           output-file: sbom-spdx.json
 
-      # - name: Sign the published Docker image
-      #   if: ${{ github.event_name != 'pull_request' }}
-      # - name: Install cosign
-      #   uses: sigstore/cosign-installer@v2.8.0
-      #   with:
-      #     cosign-release: 'v1.13.0'
-      # - name: Write signing key to disk
-      #   run: 'echo "$KEY" > cosign.key'
-      #   shell: bash
-      #   env:
-      #     KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-      #   run: |
-      #     run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ needs.image_build_and_publish.outputs.digest }}
+      - name: Install CoSign and Sign Published Image
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: sigstore/cosign-installer@v2.8.0
+        with:
+          cosign-release: 'v1.13.0'
+      - name: Write signing key to disk
+        run: 'echo "$KEY" > cosign.key'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        run: |
+          run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ needs.image_build_and_publish.outputs.digest }}
 
       # - name: Sign the SBOM
       #   if: ${{ github.event_name != 'pull_request' }}
