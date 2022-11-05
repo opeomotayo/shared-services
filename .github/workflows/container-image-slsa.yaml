@@ -137,15 +137,28 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKER_HUB }}
+      
+      - name: Download build artifact
+        uses: actions/download-artifact@v2
 
-      - name: Install Provenance and Publish SBOM with Image
-        if: ${{ github.event_name != 'pull_request' }}
+      - name: Generate provenance
         uses: slsa-framework/github-actions-demo@v0.1
         with:
-          image: {{ env.IMAGE_NAME }} #${{ needs.image_build_and_publish.outputs.image }}
-          digest: ${{ needs.image_build_and_publish.outputs.digest }}
-          registry-username: ${{ env.REGISTRY }}
-          compile-generator: true
-          private-repository: true
-        secrets:
-          registry-password: ${{ secrets.DOCKER_HUB }}
+          artifact_path: artifact/
+
+      - name: Upload provenance
+        uses: actions/upload-artifact@v2
+        with:
+          path: build.provenance
+
+      # - name: Install Provenance and Publish SBOM with Image
+      #   if: ${{ github.event_name != 'pull_request' }}
+      #   uses: slsa-framework/github-actions-demo@v0.1
+      #   with:
+      #     image: {{ env.IMAGE_NAME }} #${{ needs.image_build_and_publish.outputs.image }}
+      #     digest: ${{ needs.image_build_and_publish.outputs.digest }}
+      #     registry-username: ${{ env.REGISTRY }}
+      #     compile-generator: true
+      #     private-repository: true
+      #   secrets:
+      #     registry-password: ${{ secrets.DOCKER_HUB }}
