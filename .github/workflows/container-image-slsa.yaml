@@ -48,7 +48,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v3.2.0
         with:
-          context: .
+          context: ./container-image-security/app-image
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -172,9 +172,9 @@ jobs:
           output-file: sbom-spdx.json
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
-      - name: Write signing key to disk
-        run: 'echo "$KEY" > cosign.key'
-        shell: bash
-        env:
-          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ steps.build-and-push.outputs.digest }}
+      # - name: Write signing key to disk
+      #   run: 'echo "$KEY" > cosign.key'
+      #   shell: bash
+      #   env:
+      #     KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      #   run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ steps.build-and-push.outputs.digest }}
