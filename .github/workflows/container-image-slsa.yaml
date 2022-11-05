@@ -36,13 +36,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Extract metadata (tags, labels) for Docker
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4.1.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+             
+      # Build and push Docker image with Buildx (don't push on PR)
       - name: Build and push Docker image
         id: build-and-push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v3.2.0
         with:
-          context: ./container-image-security/app-image
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # - name: Build and push Docker image
+      #   id: build-and-push
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     context: ./container-image-security/app-image
+      #     push: true
+      #     tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
 
       - name: Get container info
         id: container_info
@@ -151,8 +170,11 @@ jobs:
           image: ${{ env.IMAGE_FULL_URL }}
           artifact-name: sbom-spdx.json
           output-file: sbom-spdx.json
-      - name:  write SBOM file
-        id: vars
-        run: echo ::set-output name=sbomfile::$(cat sbom-spdx.json)
-      - name: Display SBOM Output
-        run: echo ${{ vars.outputs.sbomfile }}
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+      - name: Write signing key to disk
+        run: 'echo "$KEY" > cosign.key'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ steps.build-and-push.outputs.digest }}
