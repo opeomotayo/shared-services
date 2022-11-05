@@ -66,28 +66,44 @@ jobs:
           image_name="${REGISTRY}/${IMAGE_NAME}"
           echo "::set-output name=image::$image_name"
     
-  image_sign_and_verify:
-    runs-on: ubuntu-latest
-    needs: [image_build_and_publish]
-    permissions:
-      contents: read
-      packages: write
+  # image_sign_and_verify:
+  #   runs-on: ubuntu-latest
+  #   needs: [image_build_and_publish]
+  #   permissions:
+  #     contents: read
+  #     packages: write
     
-    steps:
-      - name: Log into registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.DOCKER_HUB }}
+  #   steps:
+  #     - name: Log into registry
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.DOCKER_HUB }}
 
       - name: Install Syft and Generate SBOM
         id: sbom
         uses: anchore/sbom-action/download-syft@v0.7.0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.image_build_and_publish.outputs.digest }}
           artifact-name: sbom-spdx.json
           output-file: sbom-spdx.json
+
+       # Sign the resulting Docker image digest except on PRs.
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+
+      - name: Sign the SBOM
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: |
+          cosign attest --predicate sbom-spdx.json --type spdxjson "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}"
 
   #     - name: cosign-installer
   #       uses: sigstore/cosign-installer@main 
