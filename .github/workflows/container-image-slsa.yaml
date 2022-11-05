@@ -140,7 +140,7 @@ jobs:
 
       - name: Install Provenance and Publish SBOM with Image
         if: ${{ github.event_name != 'pull_request' }}
-        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
+        uses: slsa-framework/github-actions-demo@v0.1
         with:
           image: {{ env.IMAGE_NAME }} #${{ needs.image_build_and_publish.outputs.image }}
           digest: ${{ needs.image_build_and_publish.outputs.digest }}
