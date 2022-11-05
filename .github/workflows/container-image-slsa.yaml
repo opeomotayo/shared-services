@@ -36,24 +36,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Extract metadata (tags, labels) for Docker
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4.1.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      # # Extract metadata (tags, labels) for Docker
+      # - name: Extract Docker metadata
+      #   id: meta
+      #   uses: docker/metadata-action@v4.1.0
+      #   with:
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
              
-      # Build and push Docker image with Buildx (don't push on PR)
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v3.2.0
-        with:
-          context: ./container-image-security/app-image
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # # Build and push Docker image with Buildx (don't push on PR)
+      # - name: Build and push Docker image
+      #   id: build-and-push
+      #   uses: docker/build-push-action@v3.2.0
+      #   with:
+      #     context: ./container-image-security/app-image
+      #     push: ${{ github.event_name != 'pull_request' }}
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
 
       # - name: Build and push Docker image
       #   id: build-and-push
@@ -63,81 +63,81 @@ jobs:
       #     push: true
       #     tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
 
-      - name: Get container info
-        id: container_info
-        run: |
-          # echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}"
-          # docker inspect --format='{{index .RepoDigests 0}}' $IMAGE
-          image_digest="$(docker inspect "${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
-          echo "::set-output name=image-digest::${image_digest}"
-          echo "::set-output name=image-full-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
-          echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
-          echo "::set-output name=image-tags::${{ github.run_id }}"
+  #     - name: Get container info
+  #       id: container_info
+  #       run: |
+  #         # echo "::set-output name=image-digest::${{ steps.build-and-push.outputs.digest }}"
+  #         # docker inspect --format='{{index .RepoDigests 0}}' $IMAGE
+  #         image_digest="$(docker inspect "${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}" --format '{{ index .RepoDigests 0 }}' | awk -F '@' '{ print $2 }')"
+  #         echo "::set-output name=image-digest::${image_digest}"
+  #         echo "::set-output name=image-full-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}"
+  #         echo "::set-output name=image-url::${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}"
+  #         echo "::set-output name=image-tags::${{ github.run_id }}"
 
-      - name: Diplay container output
-        run: |
-          echo ${{ steps.container_info.outputs.image-full-url }}
-          echo ${{ steps.container_info.outputs.image-url }}
-          echo ${{ steps.container_info.outputs.image-tags }}
-          echo ${{ steps.container_info.outputs.image-digest }}
+  #     - name: Diplay container output
+  #       run: |
+  #         echo ${{ steps.container_info.outputs.image-full-url }}
+  #         echo ${{ steps.container_info.outputs.image-url }}
+  #         echo ${{ steps.container_info.outputs.image-tags }}
+  #         echo ${{ steps.container_info.outputs.image-digest }}
     
-  image_sign_and_verify:
-    runs-on: ubuntu-latest
-    needs: [image_build]
-    permissions:
-      contents: read
-      packages: write
+  # image_sign_and_verify:
+  #   runs-on: ubuntu-latest
+  #   needs: [image_build]
+  #   permissions:
+  #     contents: read
+  #     packages: write
 
-    env:
-      IMAGE_FULL_URL: ${{ needs.image_build.outputs.image-full-url }} #ghcr.io/opeomotayo/shared-services:339232682
-      IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }} #sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
+  #   env:
+  #     IMAGE_FULL_URL: ${{ needs.image_build.outputs.image-full-url }} #ghcr.io/opeomotayo/shared-services:339232682
+  #     IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }} #sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
     
-    steps:
-      - name: Log into registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #   steps:
+  #     - name: Log into registry
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: ${{ env.REGISTRY }}
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: cosign-installer
-        uses: sigstore/cosign-installer@main 
-      - name: Write signing key to disk
-        run: 'echo "$KEY" > cosign.key'
-        shell: bash
-        env:
-          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-      - name: Sign the published Docker image
-        env:
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: |
-          cosign sign --key cosign.key -a "author=OpeOmotayo" ${{ env.IMAGE_FULL_URL }}   
-      - name: Write signing key to disk
-        run: 'echo "$KEY" > cosign.pubkey'
-        shell: bash
-        env:
-          KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
-      - name: Verify the published Docker image
-        env:
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: | 
-          echo "::notice title=Verify signature cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }}| jq '.[0]'"
-          echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
-          echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
+  #     - name: cosign-installer
+  #       uses: sigstore/cosign-installer@main 
+  #     - name: Write signing key to disk
+  #       run: 'echo "$KEY" > cosign.key'
+  #       shell: bash
+  #       env:
+  #         KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+  #     - name: Sign the published Docker image
+  #       env:
+  #         COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+  #       run: |
+  #         cosign sign --key cosign.key -a "author=OpeOmotayo" ${{ env.IMAGE_FULL_URL }}   
+  #     - name: Write signing key to disk
+  #       run: 'echo "$KEY" > cosign.pubkey'
+  #       shell: bash
+  #       env:
+  #         KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
+  #     - name: Verify the published Docker image
+  #       env:
+  #         COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+  #       run: | 
+  #         echo "::notice title=Verify signature cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }}| jq '.[0]'"
+  #         echo "::notice title=Inspect signature bundle cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson'"
+  #         echo "::notice title=Inspect certificate cosign verify --key cosign.pubkey ${{ env.IMAGE_FULL_URL }} | jq -r '.[0].optional.Bundle.Payload.body |= @base64d | .[0].optional.Bundle.Payload.body | fromjson | .spec.signature.publicKey.content |= @base64d | .spec.signature.publicKey.content' | openssl x509 -text"
 
-  sbom_generate_attest_and_verify_attestation:
-    runs-on: ubuntu-latest
-    needs: [image_build]
+  # sbom_generate_attest_and_verify_attestation:
+  #   runs-on: ubuntu-latest
+  #   needs: [image_build]
 
-    permissions:
-      contents: read
-      packages: write
+  #   permissions:
+  #     contents: read
+  #     packages: write
 
-    env:
-      IMAGE_FULL_URL: ${{ needs.image_build.outputs.image-full-url }} #ghcr.io/opeomotayo/shared-services:339232682
-      IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }} #sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
+  #   env:
+  #     IMAGE_FULL_URL: ${{ needs.image_build.outputs.image-full-url }} #ghcr.io/opeomotayo/shared-services:339232682
+  #     IMAGE_DIGEST: ${{ needs.image_build.outputs.image-digest }} #sha256:4e5a6d443387626b082a5c42141894d2da4ca598b6afa998697fc20a501bd9aa
 
-    steps:
+    # steps:
       # - name: cosign-installer
       #   uses: sigstore/cosign-installer@main
       # - name: Install Syft
@@ -163,15 +163,15 @@ jobs:
       #     # echo "::notice title=Download SBOM attestation cosign download attestation --key cosign.key ${{ env.IMAGE_FULL_URL }}" | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://spdx.dev/Document\") | .predicate.Data | fromjson'"
   
 
-      - name: Generate SBOM
-        id: sbom
-        uses: anchore/sbom-action@v0
-        with:
-          image: ${{ env.IMAGE_FULL_URL }}
-          artifact-name: sbom-spdx.json
-          output-file: sbom-spdx.json
-      - name: Sign the published Docker image
-        if: ${{ github.event_name != 'pull_request' }}
+      # - name: Generate SBOM
+      #   id: sbom
+      #   uses: anchore/sbom-action@v0
+      #   with:
+      #     image: ${{ env.IMAGE_FULL_URL }}
+      #     artifact-name: sbom-spdx.json
+      #     output-file: sbom-spdx.json
+      # - name: Sign the published Docker image
+      #   if: ${{ github.event_name != 'pull_request' }}
       # - name: Write signing key to disk
       #   run: 'echo "$KEY" > cosign.key'
       #   shell: bash
