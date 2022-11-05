@@ -138,14 +138,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKER_HUB }}
 
-      # - name: Install Provenance and Publish SBOM with Image
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
-      #   with:
-      #     image: ${{ needs.image_build_and_publish.outputs.image }}
-      #     digest: ${{ needs.image_build_and_publish.outputs.digest }}
-      #     registry-username: ${{ env.REGISTRY }}
-      #     compile-generator: true
-      #     private-repository: true
-      #   secrets:
-      #     registry-password: ${{ secrets.DOCKER_HUB }}
+      - name: Install Provenance and Publish SBOM with Image
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
+        with:
+          image: ${{ needs.image_build_and_publish.outputs.image }}
+          digest: ${{ needs.image_build_and_publish.outputs.digest }}
+          registry-username: ${{ env.REGISTRY }}
+          compile-generator: true
+          private-repository: true
+        secrets:
+          registry-password: ${{ secrets.DOCKER_HUB }}
