@@ -129,8 +129,7 @@ jobs:
       actions: read
       contents: read
       packages: write
-      packages: write
-    
+
     steps:
       - name: Log into registry
         uses: docker/login-action@v2
