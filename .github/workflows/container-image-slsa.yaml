@@ -101,11 +101,11 @@ jobs:
         env:
           KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
         run: |
-          run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ steps.build-and-push.outputs.digest }}
+          run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key cosign.key {}@${{ needs.image_build_and_publish.outputs.digest }}
 
       - name: Sign the SBOM
         if: ${{ github.event_name != 'pull_request' }}
-          - name: Install cosign
+      - name: Install cosign
         uses: sigstore/cosign-installer@v2.8.0
         with:
           cosign-release: 'v1.13.0'
@@ -115,7 +115,7 @@ jobs:
         env:
           KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
         run: |
-          cosign attest --key cosign.key --predicate sbom-spdx.json --type spdxjson "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}"
+          cosign attest --key cosign.key --predicate sbom-spdx.json --type spdxjson "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }}"
 
   #     - name: cosign-installer
   #       uses: sigstore/cosign-installer@main 
