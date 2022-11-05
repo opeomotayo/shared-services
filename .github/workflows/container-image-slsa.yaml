@@ -122,29 +122,32 @@ jobs:
           cosign attest --key cosign.key --predicate sbom-spdx.json --type spdxjson "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }}"
   
   # This step calls the container workflow to generate provenance and push it to the container registry.
-  # generate_and_publish_provenance:
-  #   # runs-on: ubuntu-latest
-  #   needs: [image_build_and_publish]
-  #   permissions:
-  #     actions: read
-  #     contents: read
-  #     packages: write
-  #     packages: write
+  generate_and_publish_provenance:
+    runs-on: ubuntu-latest
+    needs: [image_build_and_publish]
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+      packages: write
     
-  #   # steps:
-  #   #   - name: Log into registry
-  #   #     uses: docker/login-action@v2
-  #   #     with:
-  #   #       registry: ${{ env.REGISTRY }}
-  #   #       username: ${{ github.actor }}
-  #   #       password: ${{ secrets.DOCKER_HUB }}
-  #   if: ${{ github.event_name != 'pull_request' }}
-  #   uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
-  #   with:
-  #     image: ${{ needs.image_build_and_publish.outputs.image }}
-  #     digest: ${{ needs.image_build_and_publish.outputs.digest }}
-  #     registry-username: ${{ env.REGISTRY }}
-  #     compile-generator: true
-  #     private-repository: true
-  #   secrets:
-  #     registry-password: ${{ secrets.DOCKER_HUB }}
+    steps:
+      - name: Log into registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKER_HUB }}
+
+      - name: Install Provenance and Publish SBOM with Image
+        id: provenance    
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
+        with:
+          image: ${{ needs.image_build_and_publish.outputs.image }}
+          digest: ${{ needs.image_build_and_publish.outputs.digest }}
+          registry-username: ${{ env.REGISTRY }}
+          compile-generator: true
+          private-repository: true
+        secrets:
+          registry-password: ${{ secrets.DOCKER_HUB }}
