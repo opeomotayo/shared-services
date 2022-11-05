@@ -38,7 +38,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKER_HUB }}
-          
+
       # Extract metadata (tags, labels) for Docker
       - name: Extract Docker metadata
         id: meta
@@ -46,17 +46,25 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
              
-      # # Build and push Docker image with Buildx (don't push on PR)
-      # - name: Build and push Docker image
-      #   id: build-and-push
-      #   uses: docker/build-push-action@v3.2.0
-      #   with:
-      #     context: ./container-image-security/app-image
-      #     push: ${{ github.event_name != 'pull_request' }}
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-      #     cache-from: type=gha
-      #     cache-to: type=gha,mode=max
+      # Build and push Docker image with Buildx (don't push on PR)
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v3.2.0
+        with:
+          context: ./container-image-security/app-image
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Output image
+        id: image-output
+        run: |
+          # NOTE: Set the image as an output because the `env` context is not
+          # available to the inputs of a reusable workflow call.
+          image_name="${REGISTRY}/${IMAGE_NAME}"
+          echo "::set-output name=image::$image_name"
 
       # - name: Build and push Docker image
       #   id: build-and-push
