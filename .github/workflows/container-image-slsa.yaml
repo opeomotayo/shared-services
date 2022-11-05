@@ -142,11 +142,7 @@ jobs:
       #     # cosign attest --key cosign.key --predicate sbom-spdx.json --type spdx ${IMAGE_NAME}@${IMAGE_DIGEST}
       #     # echo "::notice title=Verify SBOM attestation cosign verify-attestation --key cosign.key ${{ env.IMAGE_FULL_URL }}"
       #     # echo "::notice title=Download SBOM attestation cosign download attestation --key cosign.key ${{ env.IMAGE_FULL_URL }}" | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://spdx.dev/Document\") | .predicate.Data | fromjson'"
-      # - name:  write SBOM file
-      #   id: vars
-      #   run: echo ::set-output name=sbomfile::$(cat sbom-spdx.json)
-      # - name: Display SBOM Output
-      #   run: echo ${{ vars.outputs.sbomfile }}
+  
 
       - name: Generate SBOM
         id: sbom
@@ -155,3 +151,8 @@ jobs:
           image: ${{ env.IMAGE_FULL_URL }}
           artifact-name: sbom-spdx.json
           output-file: sbom-spdx.json
+      - name:  write SBOM file
+        id: vars
+        run: echo ::set-output name=sbomfile::$(cat sbom-spdx.json)
+      - name: Display SBOM Output
+        run: echo ${{ vars.outputs.sbomfile }}
