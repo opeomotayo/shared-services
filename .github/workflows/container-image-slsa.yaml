@@ -85,7 +85,7 @@ jobs:
         id: sbom
         uses: anchore/sbom-action/download-syft@v0.7.0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }}
           artifact-name: sbom-spdx.json
           output-file: sbom-spdx.json
 
