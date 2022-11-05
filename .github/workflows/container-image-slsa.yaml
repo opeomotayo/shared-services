@@ -142,7 +142,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@main
         with:
-          image: ${{ needs.image_build_and_publish.outputs.image }}
+          image: {{ env.IMAGE_NAME }} #${{ needs.image_build_and_publish.outputs.image }}
           digest: ${{ needs.image_build_and_publish.outputs.digest }}
           registry-username: ${{ env.REGISTRY }}
           compile-generator: true
