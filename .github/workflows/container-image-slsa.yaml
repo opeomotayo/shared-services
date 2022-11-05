@@ -21,7 +21,7 @@ jobs:
       packages: write
 
     outputs:
-      image: ${{ steps.image.outputs.image }}
+      image: ${{ steps.build-and-push.outputs.image }}
       digest: ${{ steps.build-and-push.outputs.digest }}
 
     steps:
@@ -144,7 +144,7 @@ jobs:
         with:
           image: ${{ needs.image_build_and_publish.outputs.image }}
           digest: ${{ needs.image_build_and_publish.outputs.digest }}
-          registry-username: opeomotayo
+          registry-username: ${{ env.REGISTRY }}
           compile-generator: true
           private-repository: true
         secrets:
