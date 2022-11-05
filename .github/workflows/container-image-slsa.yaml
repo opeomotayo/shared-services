@@ -14,7 +14,7 @@ env:
   IMAGE_NAME: opeomotayo/shared-services
 
 jobs:
-  image_build_and_push:
+  image_build_and_publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -68,22 +68,22 @@ jobs:
     
   image_sign_and_verify:
     runs-on: ubuntu-latest
-    needs: [image_build_and_push]
+    needs: [image_build_and_publish]
     permissions:
       contents: read
       packages: write
     
     steps:
-      # - name: Log into registry
-      #   uses: docker/login-action@v2
-      #   with:
-      #     registry: ${{ env.REGISTRY }}
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.DOCKER_HUB }}
+      - name: Log into registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKER_HUB }}
 
-      - name: Generate SBOM
+      - name: Install Syft and Generate SBOM
         id: sbom
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action/download-syft@v0.7.0
         with:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
           artifact-name: sbom-spdx.json
