@@ -38,13 +38,13 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKER_HUB }}
-
-      # # Extract metadata (tags, labels) for Docker
-      # - name: Extract Docker metadata
-      #   id: meta
-      #   uses: docker/metadata-action@v4.1.0
-      #   with:
-      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          
+      # Extract metadata (tags, labels) for Docker
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4.1.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
              
       # # Build and push Docker image with Buildx (don't push on PR)
       # - name: Build and push Docker image
