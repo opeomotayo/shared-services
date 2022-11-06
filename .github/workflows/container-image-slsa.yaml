@@ -23,7 +23,7 @@ jobs:
     outputs:
       image: ${{ steps.build-and-push.outputs.image }}
       digest: ${{ steps.build-and-push.outputs.digest }}
-      tags: ${{ steps.build-and-push.outputs.tags }}
+      tags: ${{ steps.meta.outputs.tags }}
 
     steps:
       - name: Checkout repository
