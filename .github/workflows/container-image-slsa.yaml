@@ -23,6 +23,7 @@ jobs:
     outputs:
       image: ${{ steps.build-and-push.outputs.image }}
       digest: ${{ steps.build-and-push.outputs.digest }}
+      tags: ${{ steps.build-and-push.outputs.tags }}
 
     steps:
       - name: Checkout repository
@@ -94,7 +95,7 @@ jobs:
         uses: sigstore/cosign-installer@v2.8.0
         with:
           cosign-release: 'v1.13.0'
-      - name: Write signing key to disk
+      - name: Write signing/private key to disk
         run: 'echo "$KEY" > cosign.key'
         shell: bash
         env:
@@ -110,7 +111,7 @@ jobs:
         uses: sigstore/cosign-installer@v2.8.0
         with:
           cosign-release: 'v1.13.0'
-      - name: Write signing key to disk
+      - name: Write signing/private key to disk
         run: 'echo "$KEY" > cosign.key'
         shell: bash
         env:
@@ -137,18 +138,38 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.DOCKER_HUB }}
-      
-      - name: Download build artifact
-        uses: actions/download-artifact@v3.0.1
+
+      - name: Install CoSign and Sign Published Image
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: sigstore/cosign-installer@v2.8.0
+        with:
+          cosign-release: 'v1.13.0'
+
+      - name: Write signing/private key to disk
+        run: 'echo "$KEY" > cosign.key'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+
+      - name: Write signing/public key to diskk
+        run: 'echo "$KEY" > cosign.pubkey'
+        shell: bash
+        env:
+          KEY: ${{ secrets.COSIGN_PUBLIC_KEY }}
 
       - name: Generate provenance
         uses: philips-labs/slsa-provenance-action@v0.8.0
         with:
           command: generate
-          subcommand: files
-          arguments: --artifact-path artifact/ --output-path provenance.json
+          subcommand: container
+          arguments: --repository "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" --output-path provenance.att --digest "${{ needs.image_build_and_publish.outputs.digest }}" --tags "${{ needs.image_build_and_publish.outputs.tags }}"
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          GITHUB_TOKEN: "${{ secrets.DOCKER_HUB }}"
+          IMAGE_TAGS: ${{ needs.image_build_and_publish.outputs.tags }}
 
-      - name: Upload provenance
-        uses: actions/upload-artifact@v3.1.1
-        with:
-          path: provenance.json
+      - name: Attach provenance
+        run: |
+          jq '.predicate' provenance.att > provenance-predicate.att
+          cosign attest --key cosign.key --predicate provenance-predicate.att --type slsaprovenance  "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }}"
+          # echo "::notice title=Verify provenance attestation cosign verify-attestation --key cosign.pubkey ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }} | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://slsa.dev/provenance/v0.2\")'"
