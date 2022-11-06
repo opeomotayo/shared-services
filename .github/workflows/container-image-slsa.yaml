@@ -171,5 +171,5 @@ jobs:
       - name: Attach provenance
         run: |
           jq '.predicate' provenance.att > provenance-predicate.att
-          cosign attest --key cosign.pubkey --predicate provenance-predicate.att --type slsaprovenance  "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }}"
+          cosign attest --key cosign.key --predicate provenance-predicate.att --type slsaprovenance  "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }}"
           # echo "::notice title=Verify provenance attestation cosign verify-attestation --key cosign.pubkey ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.image_build_and_publish.outputs.digest }} | jq '.payload |= @base64d | .payload | fromjson | select(.predicateType == \"https://slsa.dev/provenance/v0.2\")'"
