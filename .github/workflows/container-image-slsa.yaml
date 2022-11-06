@@ -23,7 +23,7 @@ jobs:
     outputs:
       image: ${{ steps.build-and-push.outputs.image }}
       digest: ${{ steps.build-and-push.outputs.digest }}
-      tags: "latest,${GITHUB_REF_NAME},$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"  #${{ steps.meta.outputs.tags }}
+      tags: ${GITHUB_REF_NAME} #,$(git rev-parse "${GITHUB_REF_NAME:-HEAD}")"  #${{ steps.meta.outputs.tags }}
 
     steps:
       - name: Checkout repository
