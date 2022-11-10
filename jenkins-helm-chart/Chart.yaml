@@ -1,28 +1,38 @@
 apiVersion: v2
-name: rsvpapp 
-description: A Helm chart CloudYuga's RSVP App 
-
-# A chart can be either an 'application' or a 'library' chart.
-#
-# Application charts are a collection of templates that can be packaged into versioned archives
-# to be deployed.
-#
-# Library charts provide useful utilities or functions for the chart developer. They're included as
-# a dependency of application charts to inject those utilities and functions into the rendering
-# pipeline. Library charts do not define any templates and therefore cannot be deployed.
-type: application
-
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
+name: jenkins
+home: https://jenkins.io/
 version: 0.1.0
-
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application. Versions are not expected to
-# follow Semantic Versioning. They should reflect the version the application is using.
-# It is recommended to use it with quotes.
-appVersion: "1.16.0"
-
-dependencies:
-- condition: mongodb.enabled
-  name: mongodb
+appVersion: 2.361.1
+description: Jenkins - Build great things at any scale! The leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
+sources:
+  - https://github.com/jenkinsci/jenkins
+  - https://github.com/jenkinsci/docker-inbound-agent
+  - https://github.com/maorfr/kube-tasks
+  - https://github.com/jenkinsci/configuration-as-code-plugin
+maintainers:
+  - name: maorfr
+    email: maor.friedman@redhat.com
+  - name: torstenwalter
+    email: mail@torstenwalter.de
+  - name: mogaal
+    email: garridomota@gmail.com
+  - name: wmcdona89
+    email: wmcdona89@gmail.com
+  - name: timja
+    email: timjacomb1@gmail.com
+icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
+annotations:
+  artifacthub.io/links: |
+    - name: Chart Source
+      url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
+    - name: Jenkins
+      url: https://www.jenkins.io/
+  artifacthub.io/images: |
+    - name: jenkins
+      image: jenkins/jenkins:2.361.1-jdk11
+    - name: k8s-sidecar
+      image: kiwigrid/k8s-sidecar:1.15.0
+    - name: inbound-agent
+      image: jenkins/inbound-agent:4.11.2-4
+    - name: backup
+      image: maorfr/kube-tasks:0.2.0
