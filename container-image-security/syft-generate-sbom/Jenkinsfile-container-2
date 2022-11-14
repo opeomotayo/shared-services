@@ -59,7 +59,7 @@ pipeline {
     }
     stage('Does WireFrame exist?') {
       steps {
-        dir('software-supply-lifecycle/syft'){
+        dir('container-image-security/syft-generate-sbom'){
           container('cosign-syft'){
             script {
               def WireFrameFound = sh(returnStatus:true,script:'''
