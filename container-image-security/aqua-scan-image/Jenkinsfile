@@ -1,5 +1,11 @@
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      label 'default maven build-pod'
+      defaultContainer 'security-tools'
+      yamlFile 'build-pod.yaml'
+    }
+  }
   environment {
     AQUA_ROOT_DIR="$WORKSPACE/.aqua"
     PATH="$WORKSPACE/.aqua/bin:$PATH"
