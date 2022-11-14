@@ -92,13 +92,13 @@ spec:
     #   tty: true
     # ==================================================
     # https://hub.docker.com/r/aquasec/trivy
-    # - name: trivy
-    #   #image: aquasec/trivy:0.22.0
-    #   image: aquasec/trivy:latest
-    #   imagePullPolicy: Always
-    #   command:
-    #     - cat
-    #   tty: true
+    - name: trivy
+    # image: aquasec/trivy:0.22.0
+      image: aquasec/trivy:latest
+      imagePullPolicy: Always
+      command:
+        - cat
+      tty: true
     # - name: checkov
     #   #image: bridgecrew/checkov:2.0.715
     #   image: bridgecrew/checkov:latest
