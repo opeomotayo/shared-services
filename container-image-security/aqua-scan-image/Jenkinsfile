@@ -2,7 +2,7 @@ pipeline {
   agent {
     kubernetes {
       label 'default build-pod'
-      defaultContainer 'trivy'
+      defaultContainer 'security-tools'
       yamlFile 'build-pod.yaml'
     }
   }
