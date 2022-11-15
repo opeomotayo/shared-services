@@ -1,11 +1,16 @@
 pipeline {
-  agent {
+    agent {
     kubernetes {
-      label 'default build-pod'
-      defaultContainer 'security-tools'
+      label 'default docker build-pod'
+      defaultContainer 'docker'
       yamlFile 'build-pod.yaml'
     }
   }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+  
   environment {
     AQUA_ROOT_DIR="$WORKSPACE/.aqua"
     PATH="$WORKSPACE/.aqua/bin:$PATH"
