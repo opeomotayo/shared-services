@@ -18,14 +18,14 @@ pipeline {
   stages {
     stage('Delete image if exists') {
       steps {
-        dir('software-supply-lifecycle/grype-scan-image'){
+        dir('container-image-security/trivy-scan-image'){
           sh 'docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)'
         }
       }
     }
     stage('Create container image') {
       steps {
-        dir('software-supply-lifecycle/grype-scan-image'){
+        dir('container-image-security/trivy-scan-image'){
           sh 'docker build --tag opeomotayo/java-docker:latest .'
           sh 'docker image ls'
         }
@@ -39,10 +39,10 @@ pipeline {
     }
     stage('Run Vulnerability Scan') {
       steps {
-        dir('software-supply-lifecycle/grype-scan-image'){
+        dir('container-image-security/trivy-scan-image'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'grype opeomotayo/java-docker:latest --scope AllLayers'
+            sh 'trivy image --format cyclonedx opeomotayo/java-docker:latest'
           }
         }
       }
