@@ -18,22 +18,19 @@ pipeline {
   stages {
     stage('Verify aqua installation') {
       steps {
-        sh "pwd"
-        // sh '/aquactl version'
-        // sh '/aquactl --help'
+        sh 'aqua version'
+        sh 'aqua --help'
       }
     }
     stage('Install aqua packages') {
       steps {
-        sh "ls -la /usr/local/bin"
-        // sh '/aquactl i'
+        sh 'aqua i'
       }
     }
     stage('Verify aqua packages') {
       steps {
-        sh "ls -la "
-        // sh 'command -v jq'
-        // sh 'jq --version'
+        sh 'command -v jq'
+        sh 'jq --version'
       }
     }
   }
