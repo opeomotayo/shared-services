@@ -11,20 +11,20 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '3'))
   }
 
-  environment {
-    AQUA_ROOT_DIR="$WORKSPACE/.aqua"
-    PATH="$WORKSPACE/.aqua/bin:$PATH"
-  }
+  // environment {
+  //   AQUA_ROOT_DIR="$WORKSPACE/.aqua"
+  //   PATH="$WORKSPACE/.aqua/bin:$PATH"
+  // }
   stages {
     stage('Verify aqua installation') {
       steps {
-        sh './aquactl version'
-        sh './aquactl --help'
+        sh '/aquactl version'
+        sh '/aquactl --help'
       }
     }
     stage('Install aqua packages') {
       steps {
-        sh './aquactl i'
+        sh '/aquactl i'
       }
     }
     stage('Verify aqua packages') {
