@@ -11,7 +11,7 @@ LABEL name="linuxbrew/alpine"
 RUN apk add --no-cache bash
 
 RUN apk update
-RUN apk add bash build-base curl file git gzip libc6-compat ncurses ruby ruby-dbm ruby-etc ruby-irb ruby-json sudo
+RUN apk add bash build-base curl file git gzip libc6-compat ncurses ruby ruby-bigdecimal ruby-etc ruby-irb ruby-json sudo
 RUN adduser -D -s /bin/bash linuxbrew
 RUN echo 'linuxbrew ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers
 RUN su -l linuxbrew
@@ -40,7 +40,7 @@ RUN rc-update add docker boot
 
 #cosign
 RUN wget "https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64"
-RUN  mv cosign-linux-amd64 /usr/local/bin/cosign
+RUN mv cosign-linux-amd64 /usr/local/bin/cosign
 RUN chmod +x /usr/local/bin/cosign
 
 #syft
