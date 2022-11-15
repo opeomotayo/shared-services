@@ -25,13 +25,13 @@ pipeline {
     }
     stage('Install aqua packages') {
       steps {
-        sh "ls -la"
+        sh "ls -la /usr/local/bin"
         // sh '/aquactl i'
       }
     }
     stage('Verify aqua packages') {
       steps {
-        sh "free -m"
+        sh "ls -la "
         // sh 'command -v jq'
         // sh 'jq --version'
       }
