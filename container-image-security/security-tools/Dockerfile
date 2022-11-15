@@ -3,28 +3,36 @@ FROM alpine:latest
 LABEL maintainer="Shaun Jackman <sjackman@gmail.com>"
 LABEL name="linuxbrew/alpine"
 
-RUN apk update \
-	&& apk --no-cache add bash coreutils curl file g++ grep git libc6-compat make ruby ruby-bigdecimal ruby-etc ruby-irb ruby-json ruby-test-unit sudo \
-	&& adduser -D -s /bin/bash linuxbrew \
-	&& echo 'linuxbrew ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers \
-	&& ln -s /bin/touch /usr/bin/touch
+# RUN apk update \
+# 	&& apk --no-cache add bash coreutils curl file g++ grep git libc6-compat make ruby ruby-bigdecimal ruby-etc ruby-irb ruby-json ruby-test-unit sudo \
+# 	&& adduser -D -s /bin/bash linuxbrew \
+# 	&& echo 'linuxbrew ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers \
+# 	&& ln -s /bin/touch /usr/bin/touch
 RUN apk add --no-cache bash
 
-USER linuxbrew
-WORKDIR /home/linuxbrew
-ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
-	SHELL=/bin/bash \
-	USER=linuxbrew
+RUN apk update
+RUN apk add bash build-base curl file git gzip libc6-compat ncurses ruby ruby-dbm ruby-etc ruby-irb ruby-json sudo
+RUN adduser -D -s /bin/bash linuxbrew
+RUN echo 'linuxbrew ALL=(ALL) NOPASSWD:ALL' >>/etc/sudoers
+RUN su -l linuxbrew
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+RUN PATH=$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH
 
-RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" \
-	&& HOMEBREW_NO_ANALYTICS=1 brew install -s patchelf \
-	&& HOMEBREW_NO_ANALYTICS=1 brew install --ignore-dependencies binutils gmp isl@0.18 libmpc linux-headers mpfr zlib \
-	&& (HOMEBREW_NO_ANALYTICS=1 brew install --ignore-dependencies gcc || true) \
-	&& HOMEBREW_NO_ANALYTICS=1 brew install glibc \
-	&& HOMEBREW_NO_ANALYTICS=1 brew postinstall gcc \
-	&& HOMEBREW_NO_ANALYTICS=1 brew remove patchelf \
-	&& HOMEBREW_NO_ANALYTICS=1 brew install -s patchelf \
-	&& HOMEBREW_NO_ANALYTICS=1 brew config
+# USER linuxbrew
+# WORKDIR /home/linuxbrew
+# ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
+# 	SHELL=/bin/bash \
+# 	USER=linuxbrew
+
+# RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" \
+# 	&& HOMEBREW_NO_ANALYTICS=1 brew install -s patchelf \
+# 	&& HOMEBREW_NO_ANALYTICS=1 brew install --ignore-dependencies binutils gmp isl@0.18 libmpc linux-headers mpfr zlib \
+# 	&& (HOMEBREW_NO_ANALYTICS=1 brew install --ignore-dependencies gcc || true) \
+# 	&& HOMEBREW_NO_ANALYTICS=1 brew install glibc \
+# 	&& HOMEBREW_NO_ANALYTICS=1 brew postinstall gcc \
+# 	&& HOMEBREW_NO_ANALYTICS=1 brew remove patchelf \
+# 	&& HOMEBREW_NO_ANALYTICS=1 brew install -s patchelf \
+# 	&& HOMEBREW_NO_ANALYTICS=1 brew config
 
 #docker
 RUN apk add --update docker openrc
