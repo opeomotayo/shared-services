@@ -22,9 +22,6 @@ RUN apk add jq
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
 #aqua
-RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.18.3
+RUN curl -O https://get.aquasec.com/aquactl/v3/aquactl && chmod +x ./aquactl
 
-#curl -O https://get.aquasec.com/aquactl/v3/aquactl && chmod +x ./aquactl
-#./aquactl --help
-#curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.34.0
 
