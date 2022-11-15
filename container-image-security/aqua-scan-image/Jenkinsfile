@@ -18,13 +18,13 @@ pipeline {
   stages {
     stage('Verify aqua installation') {
       steps {
-        sh '/usr/local/bin/aqua version'
-        sh '/usr/local/bin/aqua --help'
+        sh './aquactl version'
+        sh './aquactl --help'
       }
     }
     stage('Install aqua packages') {
       steps {
-        sh '/usr/local/bin/aqua i'
+        sh './aquactl i'
       }
     }
     stage('Verify aqua packages') {
