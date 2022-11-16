@@ -46,7 +46,7 @@ pipeline {
             sh 'trivy image --format spdx --output java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION' // cyclonedx, json
             sh 'trivy sbom ava-image-sbom.spdx'
             // sh 'cat java-image-sbom.spdx'
-            sh 'trivy image --no-progress --exit-code 0 --security-checks vuln --skip-update --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
+            sh 'trivy image --no-progress --exit-code 0 --skip-update --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
           }
         }
       }
