@@ -36,15 +36,13 @@ pipeline {
         }
       }
     }
-    stage('Run Vulnerability Scan') {
-      steps {
-        // dir('container-image-security/cosign-sign-image'){
-          container('security-tools'){
-            sh 'grype $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers' //--fail-on=critical
-          }
-        // }
-      }
-    }
+    // stage('Run Vulnerability Scan') {
+    //   steps {
+    //       container('security-tools'){
+    //         sh 'grype $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers' //--fail-on=critical
+    //       }
+    //   }
+    // }
     stage('Publish Image') {
       steps {
         sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
@@ -54,7 +52,7 @@ pipeline {
     stage('Sign Container Image') {
       steps {
         container('cosign-syft'){
-          // sh 'echo "$GITHUB_TOKEN_PSW" | docker login ghcr.io -u $GITHUB_TOKEN_USR --password-stdin'
+          sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
           sh 'cosign version'
           sh 'cosign sign --key $COSIGN_PRIVATE_KEY IMAGE_NAME:$IMAGE_VERSION'
         }
