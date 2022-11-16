@@ -46,8 +46,8 @@ pipeline {
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             // sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers'
-            syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o json > ./java-image-sbom.json
-            cat ./java-image-sbom.json
+            sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o json > ./java-image-sbom.json'
+            sh 'cat ./java-image-sbom.json'
           }
         }
       }
