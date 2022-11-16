@@ -40,17 +40,16 @@ pipeline {
       steps {
         dir('container-image-security/grype-scan-image'){
           container('security-tools'){
-            sh 'grype dir:. --scope AllLayers'
-            // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            // sh 'grype opeomotayo/java-docker:latest --scope AllLayers'  //--fail-on=critical
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'grype opeomotayo/java-docker:latest --scope AllLayers'  //--fail-on=critical
           }
         }
       }
     }
-    // stage('Finally done') {
-    //   steps {
-    //     echo 'if I made it here, no critical items were found'
-    //   }
-    // }
+    stage('Finally done') {
+      steps {
+        echo 'if I made it here, no critical items were found'
+      }
+    }
   }
 }
