@@ -9,6 +9,8 @@ pipeline {
 
   environment {
     DOCKER_HUB=credentials('dockerhub-cred')
+    IMAGE_NAME='opeomotayo/java-image'
+    IMAGE_VERSION='latest'
   }
 
   options {
@@ -16,43 +18,36 @@ pipeline {
   }
 
   stages {
-    stage('Delete image if exists') {
+    stage('Delete Image If Exists') {
       steps {
-        dir('container-image-security/syft-generate-sbom'){
-          sh '''
-            docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)
-            rm -f java-docker-sbom.json
-          '''
+        dir('container-image-security/cosign-sign-image'){
+          sh 'docker rmi $IMAGE_NAME:$IMAGE_VERSION || (echo "Image $IMAGE_NAME:$IMAGE_VERSION does not exist so not removed."; exit 0)'
+          sh 'docker system prune -a --volumes --force'
         }
       }
     }
     stage('Create container image') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
-          sh '''
-            docker build --tag opeomotayo/java-docker:latest .
-            docker image ls
-          '''
+          sh 'docker build --tag $IMAGE_NAME:$IMAGE_VERSION .'
+          sh 'docker image ls'
         }
       }
     }
     stage('push image') {
       steps {
-        sh '''
-          echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin
-          docker push opeomotayo/java-docker:latest
-        '''
+        sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
       }
     }
     stage('Generate SBOM') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
-            sh '''
-              echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin
-              syft packages opeomotayo/java-docker:latest --scope AllLayers -o json > ./java-docker-sbom.json
-              cat ./java-docker-sbom.json
-            '''  
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            // sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers'
+            syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o json > ./java-image-sbom.json
+            cat ./java-image-sbom.json
           }
         }
       }
@@ -60,10 +55,10 @@ pipeline {
     stage('Does WireFrame exist?') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
-          container('cosign-syft'){
+          container('security-tools'){
             script {
               def WireFrameFound = sh(returnStatus:true,script:'''
-                  cat ./java-docker-sbom.json | jq -e '.artifacts[] | select(.name =="WireFrame")'
+                  cat ./java-image-sbom.json | jq -e '.artifacts[] | select(.name =="WireFrame")'
                 ''')
               if(WireFrameFound == 0) {
                 error(message:"WireFrame was found in the SBOM. It should not be there.")
@@ -78,5 +73,6 @@ pipeline {
         echo 'if I made it here, no WireFrame was found'
       }
     }
+
   }
 }

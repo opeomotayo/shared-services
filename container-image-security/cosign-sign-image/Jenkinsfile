@@ -12,14 +12,15 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '3'))
   }
 
-   environment {
+  environment {
     DOCKER_HUB=credentials('dockerhub-cred')
-    IMAGE_NAME='opeomotayo/java-docker'
+    IMAGE_NAME='opeomotayo/java-image'
     IMAGE_VERSION='latest'
     COSIGN_PASSWORD=credentials('cosign-password')
     COSIGN_PRIVATE_KEY=credentials('cosign-private-key')
     COSIGN_PUBLIC_KEY=credentials('cosign-public-key')
   }
+  
   stages {
     stage('Delete Image If Exists') {
       steps {
