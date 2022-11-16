@@ -46,8 +46,9 @@ pipeline {
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             // sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers'
-            sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o json > ./java-image-sbom.json'
-            sh 'cat ./java-image-sbom.json'
+            sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o spdx > ./java-image-sbom.spdx' //syclonedx
+            // sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o json > ./java-image-sbom.json'
+            sh 'cat ./java-image-sbom.spdx'
           }
         }
       }
@@ -58,7 +59,7 @@ pipeline {
           container('security-tools'){
             script {
               def WireFrameFound = sh(returnStatus:true,script:'''
-                  cat ./java-image-sbom.json | jq -e '.artifacts[] | select(.name =="WireFrame")'
+                  cat ./java-image-sbom.spdx | jq -e '.artifacts[] | select(.name =="WireFrame")'
                 ''')
               if(WireFrameFound == 0) {
                 error(message:"WireFrame was found in the SBOM. It should not be there.")
