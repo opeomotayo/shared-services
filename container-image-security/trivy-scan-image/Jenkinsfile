@@ -45,7 +45,7 @@ pipeline {
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             // sh 'trivy image $IMAGE_NAME:$IMAGE_VERSION' // --format cyclonedx, spdx, json
-            sh 'trivy --format spdx --no-progress --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
+            sh 'trivy image --format spdx --no-progress --exit-code 1 --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
           }
         }
       }
