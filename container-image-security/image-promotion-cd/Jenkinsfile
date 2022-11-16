@@ -27,7 +27,7 @@ pipeline {
     stage('Update Image Tag') {
       steps {
         dir('container-image-security/image-promotion-cd'){
-          sh 'echoUpdate image tag'
+          sh 'echo Update image tag'
           // sh 'docker build --tag opeomotayo/java-docker:latest .'
           // sh 'docker image ls'
         }
