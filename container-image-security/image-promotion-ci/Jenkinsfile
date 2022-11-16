@@ -19,7 +19,7 @@ pipeline {
     stage('Delete Image If Exists') {
       steps {
         dir('container-image-security/image-promotion-ci'){
-          sh 'Delete image if exists'
+          sh 'echo Delete image if exists'
           // sh 'docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)'
         }
       }
