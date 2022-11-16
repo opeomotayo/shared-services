@@ -1,1 +1,0 @@
-Verifies the imaage's origin and authenticity
