@@ -18,6 +18,7 @@ pipeline {
     IMAGE_VERSION='latest'
     COSIGN_PASSWORD=credentials('cosign-password')
     COSIGN_PRIVATE_KEY=credentials('cosign-private-key')
+    COSIGN_PUBLIC_KEY=credentials('cosign-public-key')
   }
   stages {
     stage('Delete Image If Exists') {
@@ -51,10 +52,19 @@ pipeline {
     }
     stage('Sign Container Image') {
       steps {
-        container('cosign-syft'){
-          sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        container('security-tools'){
+          // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
           sh 'cosign version'
           sh 'cosign sign --key $COSIGN_PRIVATE_KEY IMAGE_NAME:$IMAGE_VERSION'
+        }
+      }
+    }
+    stage('Verify Signed Container Image') {
+      steps {
+        container('security-tools'){
+          // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+          // sh 'cosign version'
+          sh 'cosign verify --key $COSIGN_PUBLIC_KEY $IMAGE_NAME:$IMAGE_VERSION'
         }
       }
     }
