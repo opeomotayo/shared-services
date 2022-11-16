@@ -1,0 +1,79 @@
+pipeline {
+  agent {
+    kubernetes {
+      label 'default maven build-pod'
+      defaultContainer 'docker'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  environment {
+    DOCKER_HUB=credentials('dockerhub-cred')
+  }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+
+  stages {
+    stage('Delete Image If Exists') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Delete image if exists'
+          // sh 'docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)'
+        }
+      }
+    }
+    stage('Create Container Image') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Create container image'
+          // sh 'docker build --tag opeomotayo/java-docker:latest .'
+          // sh 'docker image ls'
+        }
+      }
+    }
+    stage('Scan Container Image') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Scan container image for vulnerabilities'
+        }
+      }
+    }
+    stage('Sign Container Image') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Sign container image'
+        }
+      }
+    }
+    stage('Generate and Scan Image SBOM') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Generate and scan image SBOM for vulnrabilities'
+        }
+      }
+    }
+    stage('Attest Image SBOM') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Attest image SBOM'
+        }
+      }
+    }
+    stage('Publish signed container image Publish container image') {
+      steps {
+        sh 'echo Publish container image'
+        // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        // sh 'docker push opeomotayo/java-docker:latest'
+      }
+    }
+    stage('Publish Attested Image SBOM') {
+      steps {
+        sh 'echo Publish Attested image SBOM'
+        // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        // sh 'docker push opeomotayo/java-docker:latest'
+      }
+    }
+  }
+}
