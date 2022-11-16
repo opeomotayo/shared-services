@@ -24,7 +24,7 @@ pipeline {
         }
       }
     }
-    stage('Create container image') {
+    stage('Create Container Image') {
       steps {
         dir('container-image-security/image-promotion-ci'){
           sh 'echo Create container image'
