@@ -40,10 +40,10 @@ pipeline {
         }
       }
     }
-    stage('Attest Image SBOM') {
+    stage('Verify Image SBOM') {
       steps {
         dir('container-image-security/image-promotion-cd'){
-          sh 'echo Attest image SBOM'
+          sh 'echo Verify image SBOM'
         }
       }
     }
