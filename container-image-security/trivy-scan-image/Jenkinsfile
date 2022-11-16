@@ -38,15 +38,23 @@ pipeline {
     //     sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
     //   }
     // }
-    stage('Scan Image Vulnerabilities') {
+    stage('Generate SBOM') {
       steps {
         dir('container-image-security/trivy-scan-image'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            // sh 'trivy image --no-progress --exit-code 0 --skip-update --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
             sh 'trivy image --format spdx --output java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION' // cyclonedx, json
+            sh 'cat java-image-sbom.spdx'
+          }
+        }
+      }
+    }
+    stage('Scan SBOM Vulnerabilities') {
+      steps {
+        dir('container-image-security/trivy-scan-image'){
+          container('security-tools'){
             sh 'trivy sbom java-image-sbom.spdx'
-            // sh 'cat java-image-sbom.spdx'
-            sh 'trivy image --no-progress --exit-code 0 --skip-update --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
           }
         }
       }
