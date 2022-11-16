@@ -34,30 +34,26 @@ pipeline {
         }
       }
     }
-  //   stage('build image') {
-  //     steps {
-  //       sh 'docker build -t $IMAGE_NAME:$IMAGE_VERSION ./cosign-sign-image'
-  //     }
-  //   }
-  //   stage('login to GHCR') {
-  //     steps {
-  //       sh 'echo "$GITHUB_TOKEN_PSW" | docker login ghcr.io -u $GITHUB_TOKEN_USR --password-stdin'
-  //     }
-  //   }
-  //   stage('tag image') {
-  //     steps {
-  //       sh 'docker tag $IMAGE_NAME:$IMAGE_VERSION ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'
-  //     }
-  //   }
-  //   stage('push image') {
-  //     steps {
-  //       sh 'docker push ghcr.io/$IMAGE_NAME:$IMAGE_VERSION'
-  //     }
-  //   }
+    stage('Run Vulnerability Scan') {
+      steps {
+        dir('container-image-security/cosign-sign-image'){
+          container('security-tools'){
+            // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'grype $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers' //--fail-on=critical
+          }
+        }
+      }
+    }
+    stage('push image') {
+      steps {
+        sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
+      }
+    }
   }
-  // post {
-  //   always {
-  //     sh 'docker logout'
-  //   }
-  // }
+  post {
+    always {
+      sh 'docker logout'
+    }
+  }
 }
