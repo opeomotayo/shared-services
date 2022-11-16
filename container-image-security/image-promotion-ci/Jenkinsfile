@@ -16,35 +16,63 @@ pipeline {
   }
 
   stages {
-    stage('Delete image if exists') {
+    stage('Delete Image If Exists') {
       steps {
-        dir('container-image-security/trivy-scan-image'){
-          sh 'docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)'
+        dir('container-image-security/image-promotion-ci'){
+          sh 'Delete image if exists'
+          // sh 'docker rmi java-docker:latest || (echo "Image java-docker:latest didnt exist so not removed."; exit 0)'
         }
       }
     }
     stage('Create container image') {
       steps {
-        dir('container-image-security/trivy-scan-image'){
-          sh 'docker build --tag opeomotayo/java-docker:latest .'
-          sh 'docker image ls'
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Create container image'
+          // sh 'docker build --tag opeomotayo/java-docker:latest .'
+          // sh 'docker image ls'
         }
       }
     }
-    stage('Publish container image') {
+    stage('Scan Container Image') {
       steps {
-        sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-        sh 'docker push opeomotayo/java-docker:latest'
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Scan container image for vulnerabilities'
+        }
       }
     }
-    stage('Run Vulnerability Scan') {
+    stage('Sign Container Image') {
       steps {
-        dir('container-image-security/trivy-scan-image'){
-          container('security-tools'){
-            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'trivy image --format cyclonedx opeomotayo/java-docker:latest'
-          }
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Sign container image'
         }
+      }
+    }
+    stage('Generate and Scan Image SBOM') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Generate and scan image SBOM for vulnrabilities'
+        }
+      }
+    }
+    stage('Attest Image SBOM') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Attest image SBOM'
+        }
+      }
+    }
+    stage('Publish signed container image Publish container image') {
+      steps {
+        sh 'echo Publish container image'
+        // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        // sh 'docker push opeomotayo/java-docker:latest'
+      }
+    }
+    stage('Publish Attested Image SBOM') {
+      steps {
+        sh 'echo Publish Attested image SBOM'
+        // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        // sh 'docker push opeomotayo/java-docker:latest'
       }
     }
   }
