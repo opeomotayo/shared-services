@@ -19,7 +19,7 @@ pipeline {
         }
       }
     }
-    stage('Generate SBOM') {
+    stage('Scan Directory Vulnerabilities') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){

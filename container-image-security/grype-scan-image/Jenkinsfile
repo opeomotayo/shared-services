@@ -1,0 +1,56 @@
+pipeline {
+  agent {
+    kubernetes {
+      label 'default maven build-pod'
+      defaultContainer 'docker'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  environment {
+    DOCKER_HUB=credentials('dockerhub-cred')
+  }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+
+  stages {
+    stage('Delete Image If Exists') {
+      steps {
+          sh 'docker rmi $IMAGE_NAME:$IMAGE_VERSION || (echo "Image $IMAGE_NAME:$IMAGE_VERSION does not exist so not removed."; exit 0)'
+          sh 'docker system prune -a --volumes --force'
+      }
+    }
+    stage('Create Container Image') {
+      steps {
+        dir('container-image-security/grype-scan-image'){
+          sh 'docker build --tag opeomotayo/java-docker:latest .'
+          sh 'docker image ls'
+        }
+      }
+    }
+    stage('Publish Container Image') {
+      steps {
+        sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        sh 'docker push opeomotayo/java-docker:latest'
+      }
+    }
+    stage('Scan Image Vulnerabilities') {
+      steps {
+        dir('container-image-security/grype-scan-image'){
+          container('security-tools'){
+            sh 'grype dir:. --scope AllLayers'
+            // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            // sh 'grype opeomotayo/java-docker:latest --scope AllLayers'  //--fail-on=critical
+          }
+        }
+      }
+    }
+    // stage('Finally done') {
+    //   steps {
+    //     echo 'if I made it here, no critical items were found'
+    //   }
+    // }
+  }
+}

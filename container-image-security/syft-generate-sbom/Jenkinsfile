@@ -20,10 +20,8 @@ pipeline {
   stages {
     stage('Delete Image If Exists') {
       steps {
-        dir('container-image-security/cosign-sign-image'){
           sh 'docker rmi $IMAGE_NAME:$IMAGE_VERSION || (echo "Image $IMAGE_NAME:$IMAGE_VERSION does not exist so not removed."; exit 0)'
           sh 'docker system prune -a --volumes --force'
-        }
       }
     }
     stage('Create Container Image') {

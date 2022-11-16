@@ -18,14 +18,13 @@ pipeline {
   }
 
   stages {
-    stage('Delete image if exists') {
+    stage('Delete Image If Exists') {
       steps {
-        dir('container-image-security/trivy-scan-image'){
-          sh 'docker rmi $IMAGE_NAME:$IMAGE_VERSION || (echo "Image $IMAGE_NAME:$IMAGE_VERSION didnt exist so not removed."; exit 0)'
-        }
+          sh 'docker rmi $IMAGE_NAME:$IMAGE_VERSION || (echo "Image $IMAGE_NAME:$IMAGE_VERSION does not exist so not removed."; exit 0)'
+          sh 'docker system prune -a --volumes --force'
       }
     }
-    stage('Create container image') {
+    stage('Create Container Image') {
       steps {
         dir('container-image-security/trivy-scan-image'){
           sh 'docker build --tag $IMAGE_NAME:$IMAGE_VERSION .'
@@ -39,13 +38,13 @@ pipeline {
     //     sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
     //   }
     // }
-    stage('Scan For Image Vulnerabilities') {
+    stage('Scan Image Vulnerabilities') {
       steps {
         dir('container-image-security/trivy-scan-image'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             // sh 'trivy image --format spdx $IMAGE_NAME:$IMAGE_VERSION' // cyclonedx, json
-            sh 'trivy image --no-progress --exit-code 1 --security-checks vuln --skip-update --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
+            sh 'trivy image --no-progress --exit-code 0 --security-checks vuln --skip-update --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
           }
         }
       }
