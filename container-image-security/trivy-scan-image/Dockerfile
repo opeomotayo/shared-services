@@ -1,9 +1,9 @@
 FROM maven:3.8.1-jdk-8 as build
 
 # Run vulnerability scan on build image
-FROM build AS vulnscan
-COPY --from=aquasec/trivy:latest /usr/local/bin/trivy /usr/local/bin/trivy
-RUN trivy rootfs --no-progress /
+# FROM build AS vulnscan
+# COPY --from=aquasec/trivy:latest /usr/local/bin/trivy /usr/local/bin/trivy
+# RUN trivy rootfs --no-progress /
 
 WORKDIR /app
 
