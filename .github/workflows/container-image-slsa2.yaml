@@ -1,7 +1,7 @@
 name: Container Image SLSA
 
 on:
-  push:
+  # push:
   #   branches: [ "master" ]
   #   # Publish semver tags as releases.
   #   tags: [ 'v*.*.*' ]
