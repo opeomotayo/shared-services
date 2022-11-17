@@ -69,6 +69,15 @@ pipeline {
         }
       }
     }
+    stage('Attest Image SBOM') {
+      steps {
+        container('security-tools'){
+          sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+          sh 'cosign version'
+          sh 'cosign attest --key $COSIGN_PRIVATE_KEY --type spdx --predicate sbom.spdx $IMAGE_NAME:$IMAGE_VERSION'
+        }
+      }
+    }
   }
   post {
     always {
