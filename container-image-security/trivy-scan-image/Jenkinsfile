@@ -44,8 +44,9 @@ pipeline {
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             // sh 'trivy image --no-progress --exit-code 0 --skip-update --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
-            sh 'trivy image --format spdx --output java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION' // cyclonedx, json
-            sh 'cat java-image-sbom.spdx'
+            // sh 'trivy image --format spdx --output java-image-sbom.spdx.json $IMAGE_NAME:$IMAGE_VERSION' // cyclonedx, json
+            sh 'trivy image --format spdx-json --output java-image-sbom.spdx.json $IMAGE_NAME:$IMAGE_VERSION'
+            sh 'cat java-image-sbom.spdx.json'
           }
         }
       }
@@ -54,19 +55,19 @@ pipeline {
       steps {
         dir('container-image-security/trivy-scan-image'){
           container('security-tools'){
-            sh 'trivy sbom java-image-sbom.spdx'
+            sh 'trivy sbom java-image-sbom.spdx.json'
           }
         }
       }
     }
-    // stage('Attest Image SBOM') {
-    //   steps {
-    //     container('security-tools'){
-    //       sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-    //       sh 'cosign version'
-    //       sh 'cosign attest --key $COSIGN_PRIVATE_KEY --type spdx --predicate java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION'
-    //     }
-    //   }
-    // }
+    stage('Attest Image SBOM') {
+      steps {
+        container('security-tools'){
+          sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+          sh 'cosign version'
+          sh 'cosign attest --key $COSIGN_PRIVATE_KEY --type spdx --predicate java-image-sbom.spdx.json $IMAGE_NAME:$IMAGE_VERSION'
+        }
+      }
+    }
   }
 }
