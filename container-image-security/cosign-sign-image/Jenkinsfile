@@ -38,13 +38,13 @@ pipeline {
         }
       }
     }
-    // stage('Run Vulnerability Scan') {
-    //   steps {
-    //       container('security-tools'){
-    //         sh 'grype $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers' //--fail-on=critical
-    //       }
-    //   }
-    // }
+    stage('Run Vulnerability Scan') {
+      steps {
+          container('security-tools'){
+            sh 'grype $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers' //--fail-on=critical
+          }
+      }
+    }
     stage('Publish Image') {
       steps {
         sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
@@ -66,15 +66,6 @@ pipeline {
           sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
           // sh 'cosign version'
           sh 'cosign verify --key $COSIGN_PUBLIC_KEY $IMAGE_NAME:$IMAGE_VERSION'
-        }
-      }
-    }
-    stage('Attest Image SBOM') {
-      steps {
-        container('security-tools'){
-          sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-          sh 'cosign version'
-          sh 'cosign attest --key $COSIGN_PRIVATE_KEY --type spdx --predicate sbom.spdx $IMAGE_NAME:$IMAGE_VERSION'
         }
       }
     }
