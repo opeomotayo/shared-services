@@ -11,6 +11,9 @@ pipeline {
     DOCKER_HUB=credentials('dockerhub-cred')
     IMAGE_NAME='opeomotayo/java-image'
     IMAGE_VERSION='latest'
+    COSIGN_PASSWORD=credentials('cosign-password')
+    COSIGN_PRIVATE_KEY=credentials('cosign-private-key')
+    COSIGN_PUBLIC_KEY=credentials('cosign-public-key')
   }
 
   options {
@@ -32,34 +35,19 @@ pipeline {
         }
       }
     }
-    // stage('Publish Container Image') {
-    //   steps {
-    //     sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-    //     sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
-    //   }
-    // }
-    // stage('Generate SBOM') {
-    //   steps {
-    //     dir('container-image-security/trivy-scan-image'){
-    //       container('security-tools'){
-    //         sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-    //         // sh 'trivy image --no-progress --exit-code 0 --skip-update --severity HIGH,CRITICAL $IMAGE_NAME:$IMAGE_VERSION'
-    //         // sh 'trivy image --format spdx --output java-image-sbom.spdx.json $IMAGE_NAME:$IMAGE_VERSION' // cyclonedx, json
-    //         sh 'trivy image --format spdx-json --output java-image-sbom.spdx.json $IMAGE_NAME:$IMAGE_VERSION'
-    //         sh 'cat java-image-sbom.spdx.json'
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Scan SBOM Vulnerabilities') {
-    //   steps {
-    //     dir('container-image-security/trivy-scan-image'){
-    //       container('security-tools'){
-    //         sh 'trivy sbom java-image-sbom.spdx.json'
-    //       }
-    //     }
-    //   }
-    // }
+    stage('Run Vulnerability Scan') {
+      steps {
+          container('security-tools'){
+            sh 'grype $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers' //--fail-on=critical
+          }
+      }
+    }
+    stage('Publish Container Image') {
+      steps {
+        sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
+      }
+    }
     stage('Generate SBOM') {
       steps {
         dir('container-image-security/trivy-scan-image'){
