@@ -2,11 +2,11 @@ name: Container Image SLSA
 
 on:
   push:
-    branches: [ "master" ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "master" ]
+  #   branches: [ "master" ]
+  #   # Publish semver tags as releases.
+  #   tags: [ 'v*.*.*' ]
+  # pull_request:
+  #   branches: [ "master" ]
   workflow_dispatch:
     
 env:
@@ -151,7 +151,7 @@ jobs:
         env:
           KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
 
-      - name: Write signing/public key to diskk
+      - name: Write signing/public key to disk
         run: 'echo "$KEY" > cosign.pubkey'
         shell: bash
         env:
