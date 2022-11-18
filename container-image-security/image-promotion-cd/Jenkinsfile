@@ -47,7 +47,7 @@ pipeline {
         }
       }
     }
-    stage('Deploy Container To Prod') {
+    stage('Verify Attestation') {
       steps {
         dir('container-image-security/image-promotion-cd'){
           sh 'echo Deploy container to Prod'

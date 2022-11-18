@@ -69,6 +69,15 @@ pipeline {
         }
       }
     }
+    stage('Verify Attestation Container Image') {
+      steps {
+        container('security-tools'){
+          sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+          // sh 'cosign version'
+          sh 'cosign verify-attestation --key $COSIGN_PUBLIC_KEY $IMAGE_NAME:$IMAGE_VERSION'
+        }
+      }
+    }
   }
   post {
     always {

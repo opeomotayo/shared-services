@@ -33,6 +33,36 @@ pipeline {
         }
       }
     }
+    stage('Sign & Publish Container Image') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Sign container image'
+        }
+      }
+    }
+    stage('Generate Image SBOM') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Generate and scan image SBOM for vulnrabilities'
+        }
+      }
+    }
+    stage('Scan SBOM Vulnerabilities') {
+      steps {
+        dir('container-image-security/trivy-scan-image'){
+          container('security-tools'){
+            sh 'trivy sbom java-image-sbom.spdx'
+          }
+        }
+      }
+    }
+    stage('Attest & Publish Image SBOM') {
+      steps {
+        dir('container-image-security/image-promotion-ci'){
+          sh 'echo Attest image SBOM'
+        }
+      }
+    }
     stage('Scan Container Image') {
       steps {
         dir('container-image-security/image-promotion-ci'){
@@ -40,37 +70,9 @@ pipeline {
         }
       }
     }
-    stage('Sign Container Image') {
-      steps {
-        dir('container-image-security/image-promotion-ci'){
-          sh 'echo Sign container image'
-        }
-      }
-    }
-    stage('Generate and Scan Image SBOM') {
-      steps {
-        dir('container-image-security/image-promotion-ci'){
-          sh 'echo Generate and scan image SBOM for vulnrabilities'
-        }
-      }
-    }
-    stage('Attest Image SBOM') {
-      steps {
-        dir('container-image-security/image-promotion-ci'){
-          sh 'echo Attest image SBOM'
-        }
-      }
-    }
-    stage('Publish signed container image Publish container image') {
+    stage('Publish Scanned Container Image') {
       steps {
         sh 'echo Publish container image'
-        // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-        // sh 'docker push opeomotayo/java-docker:latest'
-      }
-    }
-    stage('Publish Attested Image SBOM') {
-      steps {
-        sh 'echo Publish Attested image SBOM'
         // sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
         // sh 'docker push opeomotayo/java-docker:latest'
       }

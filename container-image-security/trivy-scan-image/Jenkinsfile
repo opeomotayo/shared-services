@@ -69,13 +69,24 @@ pipeline {
         }
       }
     }
-    stage('Attest Image SBOM') {
+    stage('Attest SBOM & Publish Attestation') {
       steps {
         dir('container-image-security/trivy-scan-image'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             sh 'cosign version'
-            sh 'cosign attest --key $COSIGN_PRIVATE_KEY --type spdx --predicate java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION'
+            sh 'cosign verify --key $COSIGN_PRIVATE_KEY --type spdx --predicate java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION'
+          }
+        }
+      }
+    }
+    stage('Verify Attestation') {
+      steps {
+        dir('container-image-security/trivy-scan-image'){
+          container('security-tools'){
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'cosign version'
+            sh 'cosign verify-attestation --key $COSIGN_PRIVATE_KEY --type spdx --predicate java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION'
           }
         }
       }
