@@ -75,7 +75,7 @@ pipeline {
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             sh 'cosign version'
-            sh 'cosign verify --key $COSIGN_PRIVATE_KEY --type spdx --type vuln --predicate java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION'
+            sh 'cosign verify --key $COSIGN_PRIVATE_KEY --type spdx --predicate java-image-sbom.spdx $IMAGE_NAME:$IMAGE_VERSION'
           }
         }
       }
@@ -86,7 +86,7 @@ pipeline {
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             sh 'cosign version'
-            sh 'cosign verify-attestation --key $COSIGN_PRIVATE_KEY --type spdx --type vuln $IMAGE_NAME:$IMAGE_VERSION'
+            sh 'cosign verify-attestation --key $COSIGN_PRIVATE_KEY --type spdx $IMAGE_NAME:$IMAGE_VERSION'
           }
         }
       }
