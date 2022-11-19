@@ -2,6 +2,7 @@ pipeline {
 
   environment {
     IMAGE_TAG = "${env.BUILD_NUMBER}"
+    DOCKERTAG = "latest"
   }
 
   options {
@@ -17,7 +18,7 @@ pipeline {
   }
 
   stages {
-    stage('Update GIT') {
+    stage('Deploy To Kubernetes') {
       steps{
         script {
           dir("jenkins-cd-pipelines/hello-world-cd"){
