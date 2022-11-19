@@ -18,7 +18,7 @@ pipeline {
   }
 
   stages {
-    stage('Deploy To Kubernetes') {
+    stage('Deploy App To Kubernetes') {
       steps{
         script {
           dir("jenkins-cd-pipelines/hello-world-cd"){
@@ -34,7 +34,7 @@ pipeline {
                 // myNamespace="new-namespace"
                 // kubectl get namespace | grep -q "^$myNamespace " || kubectl create namespace $myNamespace
                 sh "kubectl create namespace hello-world 2>/dev/null"
-                sh "kubctl apply -f ."
+                sh "kubectl apply -f ."
                 // sshagent(['ssh-into-k8s']) {
                 //   sh "scp -o StrictHostKeyChecking=no deployment.yaml opeomotayo@IPofk8scluster:/home/ubuntu"
                 //   script {
