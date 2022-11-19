@@ -1,0 +1,54 @@
+pipeline {
+
+  environment {
+    IMAGE_TAG = "${env.BUILD_NUMBER}"
+  }
+
+  options {
+      buildDiscarder(logRotator(numToKeepStr: '3'))
+   }
+
+  agent {
+    kubernetes {
+      label 'update-hello-world-cd'
+      defaultContainer 'kubectl'
+      yamlFile 'build-pod.yaml'
+    }
+  }
+
+  stages {
+    stage('Update GIT') {
+      steps{
+        script {
+          dir("jenkins-cd-pipelines/hello-world-cd"){
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+              withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
+                sh "git config user.email opeomotayo@gmail.com"
+                sh "git config user.name opeomotayo"
+                //sh "git switch master"
+                sh "cat deployment.yaml"
+                sh "sed -i 's+opeomotayo/hello-world-cd.*+opeomotayo/hello-world-cd:${DOCKERTAG}+g' deployment.yaml"
+                sh "cat deployment.yaml"
+                // myNamespace="new-namespace"
+                // kubectl get namespace | grep -q "^$myNamespace " || kubectl create namespace $myNamespace
+                sh "kubectl create namespace hello-world 2>/dev/null"
+                sh "kubctl apply -f ."
+                // sshagent(['ssh-into-k8s']) {
+                //   sh "scp -o StrictHostKeyChecking=no deployment.yaml opeomotayo@IPofk8scluster:/home/ubuntu"
+                //   script {
+                //       try{
+                //           sh "ssh opeomotayo@IPofk8scluster kubectl create -f ."
+                //       }catch(error){
+                //           sh "ssh opeomotayo@IPofk8scluster kubectl create -f ."
+                //       }
+                //   }
+                // }
+              }
+            }
+          }
+        }
+      }
+    } 
+  }
+}

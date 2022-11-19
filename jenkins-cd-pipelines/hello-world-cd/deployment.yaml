@@ -1,0 +1,23 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: hello-world-deployment
+  namespace: hello-world
+  labels:
+    app: hello-world-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world-app
+  template:
+    metadata:
+      labels:
+        app: hello-world-app
+    spec:
+      containers:
+      - name: hello-world-app
+        image: "opeomotayo/hello-world-cd:latest"
+        ports:
+          - containerPort: 3000
