@@ -18,6 +18,6 @@ spec:
     spec:
       containers:
       - name: hello-world-app
-        image: "opeomotayo/hello-world-cd:latest"
+        image: "opeomotayo/hello-worldlatest"
         ports:
           - containerPort: 3000
