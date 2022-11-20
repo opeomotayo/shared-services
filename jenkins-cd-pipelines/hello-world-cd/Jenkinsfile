@@ -32,7 +32,8 @@ pipeline {
                 sh "sed -i 's+opeomotayo/hello-world.*+opeomotayo/hello-world:${DOCKERTAG}+g' deployment.yaml"
                 sh "cat deployment.yaml"
                 sh "kubectl apply -f namespace.yaml"
-                sh "kubectl apply -f ."
+                sh "kubectl apply -f deployment.yaml"
+                sh "kubectl apply -f service.yaml"
                 // sshagent(['ssh-into-k8s']) {
                 //   sh "scp -o StrictHostKeyChecking=no deployment.yaml opeomotayo@IPofk8scluster:/home/ubuntu"
                 //   script {
