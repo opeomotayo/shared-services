@@ -16,8 +16,10 @@ spec:
         app: hello-world-app
     spec:
       containers:
-      - image: opeomotayo/hello-world:latest
-        name: hello-world-app
+      - name: hello-world-app
+        image: opeomotayo/hello-world:latest
+        ports:
+          - containerPort: 3000
 
 # ---
 # kind: Deployment
