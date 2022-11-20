@@ -2,9 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-world-deployment
-  name: hello-world-app
+    app: hello-world-app
+  name: hello-world-deployment
   namespace: hello-world
+spec:
   replicas: 1
   selector:
     matchLabels:
