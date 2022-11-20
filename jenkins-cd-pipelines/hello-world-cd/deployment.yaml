@@ -1,31 +1,9 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   labels:
-#     app: blog-app
-#   name: blog-app
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: blog-app
-#   template:
-#     metadata:
-#       labels:
-#         app: blog-app
-#     spec:
-#       containers:
-#       - image: opeomotayo/blog-ci:15
-#         name: blog-app
-
----
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: hello-world-deployment
-  namespace: hello-world
   labels:
-    app: hello-world-app
+    app: hello-world-deployment
+  name: hello-world-app
 spec:
   replicas: 1
   selector:
@@ -37,7 +15,29 @@ spec:
         app: hello-world-app
     spec:
       containers:
-      - name: hello-world-app
-        image: "opeomotayo/hello-world:latest"
-        # ports:
-        #   - containerPort: 3000
+      - image: opeomotayo/hello-world:latest
+        name: hello-world-app
+
+# ---
+# kind: Deployment
+# apiVersion: apps/v1
+# metadata:
+#   name: hello-world-deployment
+#   namespace: hello-world
+#   labels:
+#     app: hello-world-app
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: hello-world-app
+#   template:
+#     metadata:
+#       labels:
+#         app: hello-world-app
+#     spec:
+#       containers:
+#       - name: hello-world-app
+#         image: "opeomotayo/hello-world:latest"
+#         # ports:
+#         #   - containerPort: 3000
