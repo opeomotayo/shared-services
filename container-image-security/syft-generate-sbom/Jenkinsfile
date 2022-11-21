@@ -47,8 +47,11 @@ pipeline {
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             // sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers'
-            sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o spdx > ./java-image-sbom.spdx' //json, cyclonedx or -vv
+            // sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o spdx > ./java-image-sbom.spdx' //json, cyclonedx or -vv
+            sh 'syft $IMAGE_NAME:$IMAGE_VERSION -o json=java-image-sbom.json -o spdx-json=java-image-sbom.spdx -o cyclonedx=java-image-sbom.cyclonedx'
+            sh 'cat ./java-image-sbom.json'
             sh 'cat ./java-image-sbom.spdx'
+            sh 'cat ./java-image-sbom.cyclonedx'
           }
         }
       }
@@ -59,7 +62,6 @@ pipeline {
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             sh 'syft attest --key $COSIGN_PRIVATE_KEY $IMAGE_NAME:$IMAGE_VERSION -o cyclonedx-json > ./java-image-sbom.att.json'
-            sh 'cat ./java-image-sbom.att.json'
           }
         }
       }

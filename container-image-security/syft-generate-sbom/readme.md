@@ -1,135 +1,62 @@
-# Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-projects/spring-petclinic.png?branch=main)](https://travis-ci.org/spring-projects/spring-petclinic/)
+Syft now creates attestations using sigstore hero image
 
-## Understanding the Spring Petclinic application with a few diagrams
-<a href="https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application">See the presentation here</a>
+With the recent release of Syft v0.40.0, you can now create signed SBOM attestations directly in Syft. This is made possible by Project Sigstore, which makes signing and verification of software artifacts insanely easy.
 
-## Running petclinic locally
-Petclinic is a [Spring Boot](https://spring.io/guides/gs/spring-boot) application built using [Maven](https://spring.io/guides/gs/maven/). You can build a jar file and run it from the command line:
+Why do attestations matter for SBOMs?
+Attestations help users to validate that an SBOM comes from a trusted source in the software supply chain. As an example, I may use a container image without knowing all the software components or dependencies that are included in that image. However, if I trust whatever the producer of the container image says about what software is present, I can use the producer’s attestation to rely on that SBOM. This means that I can proceed to use the SBOM safely in my workflow in place of having done the analysis myself.
 
+What is an attestation?
+An attestation is a cryptographically signed “statement” that claims something (a “predicate”) is true about another thing (a “subject”).
 
-```
-git clone https://github.com/spring-projects/spring-petclinic.git
-cd spring-petclinic
-./mvnw package
-java -jar target/*.jar
-```
+In the container example above, the SBOM is the predicate and the container image is the subject, which means that the “signer” is attesting that the SBOM is an accurate representation of the contents of the container image.
 
-You can then access petclinic here: http://localhost:8080/
+The fact that this statement is signed means that consumers of this data can decide for themselves whether or not they trust the statement based on their trust of the identity (a public key, a person, a company, or some other entity) that did the signing. It also means that consumers can detect if the data they’re ingesting has been tampered with since the attestation was created.
 
-<img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
+The “statement” concept is extremely versatile because the subject can be anything someone is interested in: a commit in a repository, an executable file, a container image, and so on. And the predicate can describe anything about the subject: a code review, information on where the subject originally came from, or what software packages compose the subject, to name just a few examples.
 
-Or you can run it from Maven directly using the Spring Boot Maven plugin. If you do this it will pick up changes that you make in the project immediately (changes to Java source files require a compile as well - most people use an IDE for this):
+Why was attestation added to Syft?
+Syft gathers data that’s used in downstream security analysis (like vulnerability scanning), so it’s important that you have ways to safely rely on SBOM data, especially when SBOMs cross organizational boundaries. Thanks to tools like Sigstore’s Cosign, it has become incredibly easy to publish trusted data for other people to use.
 
-```
-./mvnw spring-boot:run
-```
-
-> NOTE: Windows users should set `git config core.autocrlf true` to avoid format assertions failing the build (use `--global` to set that flag globally).
-
-## In case you find a bug/suggested improvement for Spring Petclinic
-Our issue tracker is available here: https://github.com/spring-projects/spring-petclinic/issues
+Syft had already been able to produce SBOMs that could then be consumed in Cosign-based workflows (both Syft and Cosign support SBOMs in CycloneDX, SPDX, and Syft’s native format), but by bringing attestation closer to the point of data generation (directly in Syft’s execution), Syft enables a safer creation of trusted information because the statement (which includes the SBOM, itself) is signed before any data is exposed beyond the Syft process. This means there’s no chance for anyone to sneak changes into the SBOM before it gets sealed in the attestation.
 
 
-## Database configuration
+How to create SBOM attestations using Syft and Sigstore
+On top of that, the Syft and Cosign integration makes it easier to create SBOM attestations now that it’s just one command from a single tool.
 
-In its default configuration, Petclinic uses an in-memory database (H2) which
-gets populated at startup with data. The h2 console is automatically exposed at `http://localhost:8080/h2-console`
-and it is possible to inspect the content of the database using the `jdbc:h2:mem:testdb` url.
- 
-A similar setup is provided for MySql in case a persistent database configuration is needed. Note that whenever the database type is changed, the app needs to be run with a different profile: `spring.profiles.active=mysql` for MySql.
+How to create SBOM attestations with Syft
+To create an SBOM attestation in Syft, just use the new `attest` command. Syft uses in-toto attestations, which is a particular framework and specification for creating and using attestations. In one fell swoop, Syft will generate an SBOM for the specified target and create an in-toto attestation for that SBOM, using Cosign’s library internally to generate and sign the in-toto statement.
 
-You could start MySql locally with whatever installer works for your OS, or with docker:
+1. If you don’t have a Cosign key pair, generate one.
 
-```
-docker run -e MYSQL_USER=petclinic -e MYSQL_PASSWORD=petclinic -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=petclinic -p 3306:3306 mysql:5.7.8
-```
+$ cosign generate-key-pair
 
-Further documentation is provided [here](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources/db/mysql/petclinic_db_setup_mysql.txt).
+Note: Your private key is encrypted with a password. When you’re generating the key pair, you can store a password in the `COSIGN_PASSWORD` environment variable to get prompted by Cosign. Additionally, if you’ve already stored your password in `COSIGN_PASSWORD`, Syft will find this password and won’t need to ask you for it when signing the SBOM attestation.
 
-## Working with Petclinic in your IDE
+2. To create the SBOM attestation and write the attestation to a file, use `syft attest` with a file redirect. (Note that aside from the `–key` argument, `syft attest <image>` just uses the same syntax as `syft <image>`!)
 
-### Prerequisites
-The following items should be installed in your system:
-* Java 8 or newer (full JDK not a JRE).
-* git command line tool (https://help.github.com/articles/set-up-git)
-* Your preferred IDE 
-  * Eclipse with the m2e plugin. Note: when m2e is available, there is an m2 icon in `Help -> About` dialog. If m2e is
-  not there, just follow the install process here: https://www.eclipse.org/m2e/
-  * [Spring Tools Suite](https://spring.io/tools) (STS)
-  * IntelliJ IDEA
-  * [VS Code](https://code.visualstudio.com)
+$ syft attest --key ./cosign.key <my-image> -o cyclonedx-json > ./my-image-sbom.att.json
 
-### Steps:
+3. If you want, you can use Cosign to attach the attestation to an image in a container registry.
 
-1) On the command line
-    ```
-    git clone https://github.com/spring-projects/spring-petclinic.git
-    ```
-2) Inside Eclipse or STS
-    ```
-    File -> Import -> Maven -> Existing Maven project
-    ```
+$ cosign attach attestation <my-image> --attestation ./my-image-sbom.att.json
 
-    Then either build on the command line `./mvnw generate-resources` or using the Eclipse launcher (right click on project and `Run As -> Maven install`) to generate the css. Run the application main method by right clicking on it and choosing `Run As -> Java Application`.
+Great! Now anyone who has your public key can use Cosign to verify your SBOM attestation, which means they can trust the SBOM’s representation of your container image.
 
-3) Inside IntelliJ IDEA
-    In the main menu, choose `File -> Open` and select the Petclinic [pom.xml](pom.xml). Click on the `Open` button.
+$ cosign verify-attestation <my-image> --key ./cosign.pub
 
-    CSS files are generated from the Maven build. You can either build them on the command line `./mvnw generate-resources` or right click on the `spring-petclinic` project then `Maven -> Generates sources and Update Folders`.
+SBOM formats used for attestations
+In-toto statements are flexible with the format of the predicate data (which is the SBOM, in this case). Statements declare the type of the predicate with a “predicateType” field. Since the statement is JSON data, the predicate data within the statement should also be JSON data.
 
-    A run configuration named `PetClinicApplication` should have been created for you if you're using a recent Ultimate version. Otherwise, run the application by right clicking on the `PetClinicApplication` main class and choosing `Run 'PetClinicApplication'`.
+Syft can create attestations with the CycloneDX JSON format, the SPDX JSON format, and with Syft’s own lossless JSON format. If you don’t specify a format, Syft defaults to its lossless JSON format.
 
-4) Navigate to Petclinic
+Read more about Syft’s attestation workflow.
 
-    Visit [http://localhost:8080](http://localhost:8080) in your browser.
+Looking ahead with Syft, Grype, and Sigstore
+We plan to integrate Syft more deeply with Sigstore in the coming months, starting by adding support for Sigstore’s “keyless workflow,” which eliminates the need for users to manage their own key pairs.
 
+We also plan to extend attestation support into Grype to enable vulnerability scans based on trusted SBOM analysis and to provide attestations for vulnerability scans. We view attestations as a significant enhancement to the existing security workflows of the Syft and Grype ecosystem.
 
-## Looking for something in particular?
+Be sure to grab the latest release of Syft and try out SBOM attestation for yourself!
 
-|Spring Boot Configuration | Class or Java property files  |
-|--------------------------|---|
-|The Main Class | [PetClinicApplication](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java) |
-|Properties Files | [application.properties](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources) |
-|Caching | [CacheConfiguration](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/java/org/springframework/samples/petclinic/system/CacheConfiguration.java) |
+https://anchore.com/sbom/creating-sbom-attestations-using-syft-and-sigstore/
 
-## Interesting Spring Petclinic branches and forks
-
-The Spring Petclinic "main" branch in the [spring-projects](https://github.com/spring-projects/spring-petclinic)
-GitHub org is the "canonical" implementation, currently based on Spring Boot and Thymeleaf. There are
-[quite a few forks](https://spring-petclinic.github.io/docs/forks.html) in a special GitHub org
-[spring-petclinic](https://github.com/spring-petclinic). If you have a special interest in a different technology stack
-that could be used to implement the Pet Clinic then please join the community there.
-
-
-## Interaction with other open source projects
-
-One of the best parts about working on the Spring Petclinic application is that we have the opportunity to work in direct contact with many Open Source projects. We found some bugs/suggested improvements on various topics such as Spring, Spring Data, Bean Validation and even Eclipse! In many cases, they've been fixed/implemented in just a few days.
-Here is a list of them:
-
-| Name | Issue |
-|------|-------|
-| Spring JDBC: simplify usage of NamedParameterJdbcTemplate | [SPR-10256](https://jira.springsource.org/browse/SPR-10256) and [SPR-10257](https://jira.springsource.org/browse/SPR-10257) |
-| Bean Validation / Hibernate Validator: simplify Maven dependencies and backward compatibility |[HV-790](https://hibernate.atlassian.net/browse/HV-790) and [HV-792](https://hibernate.atlassian.net/browse/HV-792) |
-| Spring Data: provide more flexibility when working with JPQL queries | [DATAJPA-292](https://jira.springsource.org/browse/DATAJPA-292) |
-
-
-# Contributing
-
-The [issue tracker](https://github.com/spring-projects/spring-petclinic/issues) is the preferred channel for bug reports, features requests and submitting pull requests.
-
-For pull requests, editor preferences are available in the [editor config](.editorconfig) for easy use in common text editors. Read more and download plugins at <https://editorconfig.org>. If you have not previously done so, please fill out and submit the [Contributor License Agreement](https://cla.pivotal.io/sign/spring).
-
-# License
-
-The Spring PetClinic sample application is released under version 2.0 of the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
-
-[spring-petclinic]: https://github.com/spring-projects/spring-petclinic
-[spring-framework-petclinic]: https://github.com/spring-petclinic/spring-framework-petclinic
-[spring-petclinic-angularjs]: https://github.com/spring-petclinic/spring-petclinic-angularjs 
-[javaconfig branch]: https://github.com/spring-petclinic/spring-framework-petclinic/tree/javaconfig
-[spring-petclinic-angular]: https://github.com/spring-petclinic/spring-petclinic-angular
-[spring-petclinic-microservices]: https://github.com/spring-petclinic/spring-petclinic-microservices
-[spring-petclinic-reactjs]: https://github.com/spring-petclinic/spring-petclinic-reactjs
-[spring-petclinic-graphql]: https://github.com/spring-petclinic/spring-petclinic-graphql
-[spring-petclinic-kotlin]: https://github.com/spring-petclinic/spring-petclinic-kotlin
-[spring-petclinic-rest]: https://github.com/spring-petclinic/spring-petclinic-rest
