@@ -1,8 +1,7 @@
 pipeline {
 
   environment {
-    IMAGE_TAG = "${env.BUILD_NUMBER}"
-    DOCKERTAG = "latest"
+    IMAGE_TAG = "latest" //${env.BUILD_NUMBER}"
   }
 
   options {
@@ -29,7 +28,7 @@ pipeline {
                 // sh "git config user.name opeomotayo"
                 //sh "git switch master"
                 sh "cat deployment.yaml"
-                sh "sed -i 's+opeomotayo/hello-world.*+opeomotayo/hello-world:${DOCKERTAG}+g' deployment.yaml"
+                sh "sed -i 's+opeomotayo/hello-world.*+opeomotayo/hello-world:${IMAGE_TAG}+g' deployment.yaml"
                 sh "cat deployment.yaml"
                 // sh "kubectl apply -f namespace.yaml"
                 sh "kubectl apply -f ."
