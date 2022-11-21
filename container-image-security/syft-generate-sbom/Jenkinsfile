@@ -76,12 +76,12 @@ pipeline {
         }
       }
     }
-    stage('Attach Attestation to an Image') {
+    stage('Verify your SBOM Attestation') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'cosign attach attestation $IMAGE_NAME:$IMAGE_VERSION --attestation ./java-image-sbom.att.json'
+            sh 'cosign verify-attestation $IMAGE_NAME:$IMAGE_VERSION --key $COSIGN_PUBLIC_KEY'
           }
         }
       }
