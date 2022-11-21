@@ -41,7 +41,7 @@ pipeline {
         sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
       }
     }
-    stage('Generate spdx SBOM') {
+    stage('Generate SBOM (json, spdx & cyclonedx)') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
@@ -71,7 +71,7 @@ pipeline {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'grype att:./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY' //grype ./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY
+            sh 'grype att:./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY --fail-on=critical' //grype ./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY
           }
         }
       }
@@ -81,7 +81,6 @@ pipeline {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            // syft attest --output json --key cosign.key alpine:latest | grype --key cosign.pub
             sh 'cosign attach attestation $IMAGE_NAME:$IMAGE_VERSION --attestation ./java-image-sbom.att.json'
           }
         }
