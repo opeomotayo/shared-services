@@ -11,6 +11,9 @@ pipeline {
     DOCKER_HUB=credentials('dockerhub-cred')
     IMAGE_NAME='opeomotayo/java-image'
     IMAGE_VERSION='latest'
+    COSIGN_PASSWORD=credentials('cosign-password')
+    COSIGN_PRIVATE_KEY=credentials('cosign-private-key')
+    COSIGN_PUBLIC_KEY=credentials('cosign-public-key')
   }
 
   options {
@@ -38,14 +41,25 @@ pipeline {
         sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
       }
     }
-    stage('Generate SBOM') {
+    stage('Generate spdx SBOM') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             // sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers'
-            sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o spdx > ./java-image-sbom.spdx' //json, syclonedx or -vv
+            sh 'syft packages $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers -o spdx > ./java-image-sbom.spdx' //json, cyclonedx or -vv
             sh 'cat ./java-image-sbom.spdx'
+          }
+        }
+      }
+    }
+    stage('Attest cyclonedx-json SBOM') {
+      steps {
+        dir('container-image-security/syft-generate-sbom'){
+          container('security-tools'){
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'syft attest --key $COSIGN_PRIVATE_KEY $IMAGE_NAME:$IMAGE_VERSION -o cyclonedx-json > ./java-image-sbom.att.json
+            sh 'cat ./java-image-sbom.att.json'
           }
         }
       }
