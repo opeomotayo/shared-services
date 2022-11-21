@@ -56,12 +56,32 @@ pipeline {
         }
       }
     }
-    stage('Attest cyclonedx-json SBOM') {
+    stage('SBOM Attestation') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
             sh 'syft attest --key $COSIGN_PRIVATE_KEY $IMAGE_NAME:$IMAGE_VERSION -o cyclonedx-json > ./java-image-sbom.att.json'
+          }
+        }
+      }
+    }
+    stage('Attach Attestation to an Image') {
+      steps {
+        dir('container-image-security/syft-generate-sbom'){
+          container('security-tools'){
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'cosign attach attestation $IMAGE_NAME:$IMAGE_VERSION --attestation ./java-image-sbom.att.json'
+          }
+        }
+      }
+    }
+    stage('Attach Attestation to an Image') {
+      steps {
+        dir('container-image-security/syft-generate-sbom'){
+          container('security-tools'){
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'cosign attach attestation $IMAGE_NAME:$IMAGE_VERSION --attestation ./java-image-sbom.att.json'
           }
         }
       }
