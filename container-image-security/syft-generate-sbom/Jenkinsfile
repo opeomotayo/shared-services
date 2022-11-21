@@ -56,7 +56,7 @@ pipeline {
         }
       }
     }
-    stage('SBOM Attestation') {
+    stage('Attest an image with Syft') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
@@ -66,11 +66,22 @@ pipeline {
         }
       }
     }
+    stage('Scan an SBOM from an Attestation') {
+      steps {
+        dir('container-image-security/syft-generate-sbom'){
+          container('security-tools'){
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'grype att:./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY' //grype ./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY
+          }
+        }
+      }
+    }
     stage('Attach Attestation to an Image') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            // syft attest --output json --key cosign.key alpine:latest | grype --key cosign.pub
             sh 'cosign attach attestation $IMAGE_NAME:$IMAGE_VERSION --attestation ./java-image-sbom.att.json'
           }
         }
