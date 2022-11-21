@@ -34,6 +34,7 @@ pipeline {
                 sh "kubectl apply -f namespace.yaml"
                 sh "kubectl apply -f deployment.yaml"
                 sh "kubectl apply -f service.yaml"
+                sh "kubectl apply -f ingress.yaml"
                 // sshagent(['ssh-into-k8s']) {
                 //   sh "scp -o StrictHostKeyChecking=no deployment.yaml opeomotayo@IPofk8scluster:/home/ubuntu"
                 //   script {
