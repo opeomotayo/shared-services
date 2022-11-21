@@ -41,7 +41,7 @@ pipeline {
         sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
       }
     }
-    stage('Generate SBOM (json, spdx & cyclonedx)') {
+    stage('Generate SBOM (formats: json, spdx & cyclonedx)') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
@@ -56,7 +56,7 @@ pipeline {
         }
       }
     }
-    stage('Attest an image with Syft') {
+    stage('Attest Image with Syft') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
@@ -66,32 +66,12 @@ pipeline {
         }
       }
     }
-    stage('Scan an SBOM from an Attestation') {
+    stage('Scan SBOM from Attestation') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'grype att:./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY --fail-on=critical' //grype ./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY
-          }
-        }
-      }
-    }
-    stage('Attach Attestation to an Image') {
-      steps {
-        dir('container-image-security/syft-generate-sbom'){
-          container('security-tools'){
-            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'cosign attach attestation $IMAGE_NAME:$IMAGE_VERSION --attestation ./java-image-sbom.att.json'
-          }
-        }
-      }
-    }
-    stage('Verify your SBOM Attestation') {
-      steps {
-        dir('container-image-security/syft-generate-sbom'){
-          container('security-tools'){
-            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'cosign verify-attestation $IMAGE_NAME:$IMAGE_VERSION --key $COSIGN_PUBLIC_KEY'
+            sh 'grype att:./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY' //--fail-on=critical //grype ./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY
           }
         }
       }
@@ -112,6 +92,26 @@ pipeline {
     //     }
     //   }
     // }
+    stage('Attach Attestation to Image') {
+      steps {
+        dir('container-image-security/syft-generate-sbom'){
+          container('security-tools'){
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'cosign attach attestation $IMAGE_NAME:$IMAGE_VERSION --attestation ./java-image-sbom.att.json'
+          }
+        }
+      }
+    }
+    stage('Verify your SBOM Attestation') {
+      steps {
+        dir('container-image-security/syft-generate-sbom'){
+          container('security-tools'){
+            sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+            sh 'cosign verify-attestation $IMAGE_NAME:$IMAGE_VERSION --key $COSIGN_PUBLIC_KEY'
+          }
+        }
+      }
+    }
     stage('Finally done') {
       steps {
         echo 'if I made it here, no WireFrame was found'
