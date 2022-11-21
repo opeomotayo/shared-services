@@ -35,17 +35,17 @@ pipeline {
         }
       }
     }
+    stage('Publish Container Image') {
+      steps {
+        sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
+        sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
+      }
+    }
     stage('Run Vulnerability Scan') {
       steps {
           container('security-tools'){
             sh 'grype $IMAGE_NAME:$IMAGE_VERSION --scope AllLayers' //--fail-on=critical
           }
-      }
-    }
-    stage('Publish Container Image') {
-      steps {
-        sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-        sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
       }
     }
     stage('Generate SBOM') {
