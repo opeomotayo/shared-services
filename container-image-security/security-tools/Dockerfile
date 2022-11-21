@@ -1,9 +1,9 @@
-FROM alpine
+FROM rancher/dind-alpine
 
 RUN apk update 
 
 #docker
-RUN apk add --update docker openrc --no-cache bash
+RUN apk add --update docker openrc bash
 RUN rc-update add docker boot
 RUN apk update
 
