@@ -2,7 +2,7 @@ pipeline {
   agent {
     kubernetes {
       label 'default maven build-pod'
-      defaultContainer 'docker'
+      defaultContainer 'security-tools'
       yamlFile 'build-pod.yaml'
     }
   }
