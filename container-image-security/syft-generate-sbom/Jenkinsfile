@@ -27,7 +27,7 @@ pipeline {
           sh 'docker system prune -a --volumes --force'
       }
     }
-    stage('Create Container Image') {
+    stage('Build Image') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           sh 'docker build --tag $IMAGE_NAME:$IMAGE_VERSION .'
@@ -41,7 +41,7 @@ pipeline {
         sh 'docker push $IMAGE_NAME:$IMAGE_VERSION'
       }
     }
-    stage('Generate SBOM (formats: json, spdx & cyclonedx)') {
+    stage('Generate Image SBOM (formats: json, spdx & cyclonedx)') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){

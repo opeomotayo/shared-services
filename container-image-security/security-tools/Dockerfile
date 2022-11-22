@@ -1,9 +1,13 @@
 FROM alpine:latest
 
-RUN apk update 
+RUN apk update
+
+#bash
+RUN apk add bash
 
 #docker
-RUN apk add --update bash
+RUN apk add --update docker openrc
+RUN rc-update add docker boot
 
 #cosign
 RUN wget "https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64"
@@ -13,10 +17,6 @@ RUN chmod +x /usr/local/bin/cosign
 #syft
 RUN apk add curl
 RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
-
-#docker
-RUN apk add --update docker openrc
-RUN rc-update add docker boot
 
 #jq
 RUN apk add jq
