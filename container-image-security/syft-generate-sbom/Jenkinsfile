@@ -30,8 +30,10 @@ pipeline {
     stage('Build Image') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
-          sh 'docker build --tag $IMAGE_NAME:$IMAGE_VERSION .'
-          sh 'docker image ls'
+          container('security-tools'){
+            sh 'docker build --tag $IMAGE_NAME:$IMAGE_VERSION .'
+            sh 'docker image ls'
+          }
         }
       }
     }
@@ -66,12 +68,13 @@ pipeline {
         }
       }
     }
-    stage('Scan SBOM from Attestation') {
+    stage('Scan & Identify SBOM Vulnerabilities') {
       steps {
         dir('container-image-security/syft-generate-sbom'){
           container('security-tools'){
             sh 'echo "$DOCKER_HUB_PSW" | docker login -u $DOCKER_HUB_USR --password-stdin'
-            sh 'grype att:./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY' //--fail-on=critical //grype ./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY
+            sh 'grype sbom:./java-image-sbom.json' //--fail-on=critical 
+            // sh 'grype att:./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY' //--fail-on=critical //grype ./java-image-sbom.att.json --key $COSIGN_PUBLIC_KEY
           }
         }
       }
