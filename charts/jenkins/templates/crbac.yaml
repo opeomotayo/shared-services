@@ -38,6 +38,7 @@ rules:
   - namespaces
   - events
   - secrets
+  - ingress
   verbs:
   - create
   - get
