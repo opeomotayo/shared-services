@@ -1,7 +1,7 @@
 pipeline {
 
   environment {
-    IMAGE_TAG = "latest" //${env.BUILD_NUMBER}"
+    IMAGE_TAG = ${env.BUILD_NUMBER}"
   }
 
   options {
@@ -17,36 +17,52 @@ pipeline {
   }
 
   stages {
-    stage('Deploy App To Kubernetes') {
+    stage('Update Image Taga') {
       steps{
         script {
           dir("jenkins-cd-pipelines/hello-world-cd"){
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-              withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
-                // sh "git config user.email opeomotayo@gmail.com"
-                // sh "git config user.name opeomotayo"
-                //sh "git switch master"
                 sh "cat deployment.yaml"
+                sh "sed -i 's+opeomotayo/blog-ci.*+opeomotayo/blog-ci:${DOCKERTAG}+g' blog-deployment.yaml"
                 sh "sed -i 's+opeomotayo/hello-world.*+opeomotayo/hello-world:${IMAGE_TAG}+g' deployment.yaml"
                 sh "cat deployment.yaml"
-                // sh "kubectl apply -f namespace.yaml"
                 sh "kubectl apply -f ."
-                // sshagent(['ssh-into-k8s']) {
-                //   sh "scp -o StrictHostKeyChecking=no deployment.yaml opeomotayo@IPofk8scluster:/home/ubuntu"
-                //   script {
-                //       try{
-                //           sh "ssh opeomotayo@IPofk8scluster kubectl create -f ."
-                //       }catch(error){
-                //           sh "ssh opeomotayo@IPofk8scluster kubectl create -f ."
-                //       }
-                //   }
-                // }
               }
             }
           }
         }
       }
-    } 
+    }
+    // stage('Deploy App To Kubernetes') {
+    //   steps{
+    //     script {
+    //       dir("jenkins-cd-pipelines/hello-world-cd"){
+    //         catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+    //           withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+    //             //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
+    //             // sh "git config user.email opeomotayo@gmail.com"
+    //             // sh "git config user.name opeomotayo"
+    //             //sh "git switch master"
+    //             sh "cat deployment.yaml"
+    //             sh "sed -i 's+opeomotayo/hello-world.*+opeomotayo/hello-world:${IMAGE_TAG}+g' deployment.yaml"
+    //             sh "cat deployment.yaml"
+    //             // sh "kubectl apply -f namespace.yaml"
+    //             sh "kubectl apply -f ."
+    //             // sshagent(['ssh-into-k8s']) {
+    //             //   sh "scp -o StrictHostKeyChecking=no deployment.yaml opeomotayo@IPofk8scluster:/home/ubuntu"
+    //             //   script {
+    //             //       try{
+    //             //           sh "ssh opeomotayo@IPofk8scluster kubectl create -f ."
+    //             //       }catch(error){
+    //             //           sh "ssh opeomotayo@IPofk8scluster kubectl create -f ."
+    //             //       }
+    //             //   }
+    //             // }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   }
+    // } 
   }
 }
