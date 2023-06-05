@@ -31,4 +31,4 @@ We'd love to have you contribute! Please refer to our [contribution guidelines](
 [Apache 2.0 License](https://github.com/jenkinsci/helm-charts/blob/main/LICENSE).
 
 
-https://us05web.zoom.us/j/85256838156?pwd=UTY4QlN5MWl1SGdUMUw3VnJUb0RiUT09
+https://upwork-dash.zoom.us/j/94321764401?pwd=V0hnK0tsKzVwM3RmVFAyNFB5WU5jUT09
